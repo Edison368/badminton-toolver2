@@ -1,21 +1,21 @@
 ﻿<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>羽毛球分组工具</title>
+  <title>バドミントンチーム分けツール</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
-      background: #f4f4f4; /* 浅色背景 */
-      color: #000; /* 文字改为黑色 */
+      background: #f4f4f4; /* 明るい背景 */
+      color: #000; /* テキストは黒に */
     }
 
     header {
       display: flex;
       align-items: center;
-      background-color: rgba(255, 255, 255, 0.1); /* 背景颜色透明度降低 */
+      background-color: rgba(255, 255, 255, 0.1); /* 背景の透明度を下げる */
       padding: 10px 20px;
       border-radius: 10px;
       margin-bottom: 20px;
@@ -104,7 +104,7 @@
     }
 
     .input-group input, .input-group textarea {
-      width: 48%; /* 缩小宽度 */
+      width: 48%;
     }
 
     .flex-row {
@@ -136,7 +136,6 @@
       }
     }
 
-    /* 生成的组合文字黑色并加粗 */
     .bold-text {
       font-weight: bold;
       color: black;
@@ -146,41 +145,41 @@
 <body>
   <header>
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaFxuFtnA0V3zsmO_XSDUVFhbErsh_851E8w&s" alt="Logo">
-    <h2>🏸 羽毛球分组工具</h2>
+    <h2>🏸 バドミントンチーム分けツール</h2>
   </header>
 
   <div class="inputs">
-    <label>场地数量：<input type="number" id="courtCount" min="1" /></label>
-    <label>总轮次：<input type="number" id="totalRounds" min="1" value="1" /></label>
+    <label>コート数：<input type="number" id="courtCount" min="1" /></label>
+    <label>総ラウンド数：<input type="number" id="totalRounds" min="1" value="1" /></label>
 
     <div class="flex-row">
       <div class="flex-child input-group">
-        <label>球员姓名（每行一个）：</label>
-        <textarea id="playerNames" rows="3" placeholder="张三\n李四\n王五"></textarea>
+        <label>プレイヤー名（1行につき1名）：</label>
+        <textarea id="playerNames" rows="3" placeholder="張三\李四\王五"></textarea>
       </div>
       <div class="flex-child input-group">
-        <label>对应水平（初学1，高级10，空则自动分配）：</label>
+        <label>レベル（初心者1、上級10、省略で自動割当）：</label>
         <textarea id="playerLevels" rows="3" placeholder="7\n6\n8"></textarea>
       </div>
     </div>
 
     <div class="input-group">
-      <label>中途加入的球员姓名（每行一个）：</label>
-      <textarea id="additionalPlayers" rows="2" placeholder="新增球员姓名\n如：赵六\n王二"></textarea>
+      <label>途中参加プレイヤー名（1行につき1名）：</label>
+      <textarea id="additionalPlayers" rows="2" placeholder="追加プレイヤー名\例：趙六\王二"></textarea>
     </div>
 
     <div class="flex-row">
       <div class="flex-child input-group">
-        <label>中途加入球员的水平（初学1，高级10，空则自动分配）：</label>
+        <label>途中参加プレイヤーレベル（初心者1、上級10、省略で自動割当）：</label>
         <textarea id="additionalLevels" rows="2" placeholder="7\n8"></textarea>
       </div>
       <div class="flex-child input-group">
-        <label>中途加入球员的插入轮次（仅输入一个数字）：</label>
-        <input type="number" id="additionalCourt" placeholder="例如：2">
+        <label>途中参加プレイヤーの開始ラウンド（数字のみ）：</label>
+        <input type="number" id="additionalCourt" placeholder="例：2">
       </div>
     </div>
 
-    <button onclick="generateRounds()">🎯 生成对局</button>
+    <button onclick="generateRounds()">🎯 対戦を生成</button>
   </div>
 
   <div class="result" id="output"></div>
@@ -207,11 +206,11 @@
         let b = [group[c[2]], group[c[3]]];
         let aLevel = a[0][1] + a[1][1];
         let bLevel = b[0][1] + b[1][1];
-        let rawDiff = aLevel - bLevel;  // 带正负号的差值
+        let rawDiff = aLevel - bLevel;
         let absDiff = Math.abs(rawDiff);
         if (absDiff < minDiff) {
           minDiff = absDiff;
-          best = [a, b, rawDiff];  // 保留正负号
+          best = [a, b, rawDiff];
         }
       });
       return best;
@@ -250,37 +249,36 @@
 
       let fullHtml = "";
 
-      for (let roundNumber = 1; roundNumber <= totalRounds * 2; roundNumber++) {  <!-- Changed rounds to double -->
+      for (let roundNumber = 1; roundNumber <= totalRounds * 2; roundNumber++) {
         let availablePlayers = [...originalPlayers];
         lateJoiners.forEach(p => {
           if (roundNumber >= p[2]) availablePlayers.push([p[0], p[1]]);
         });
 
-        // 按上场次数排序（升序）
         availablePlayers.sort((a, b) => playCountMap[a[0]] - playCountMap[b[0]]);
 
         const selectedPlayers = availablePlayers.slice(0, courtCount * 4);
 
-        let html = `<h3>第 ${roundNumber} 轮</h3>`;
-        html += "<table><tr><th>场地</th><th>队伍 A</th><th>队伍 B</th><th>水平差A-B</th></tr>";
+        let html = `<h3>第 ${roundNumber} ラウンド</h3>`;
+        html += "<table><tr><th>コート</th><th>チーム A</th><th>チーム B</th><th>A-B 差</th></tr>";
 
         for (let i = 0; i < courtCount; i++) {
           let group = selectedPlayers.slice(i * 4, i * 4 + 4);
           if (group.length < 4) {
-            html += `<tr><td>场地 ${i + 1}</td><td colspan="2">自由练习</td><td>无</td></tr>`;
+            html += `<tr><td>コート ${i + 1}</td><td colspan="2">自由練習</td><td>なし</td></tr>`;
             continue;
           }
           const [a, b, diff] = bestBalancedSplit(group);
           a.forEach(player => playCountMap[player[0]]++);
           b.forEach(player => playCountMap[player[0]]++);
-          html += `<tr><td>场地 ${i + 1}</td><td><span class="bold-text">${a[0][0]} & ${a[1][0]}</span></td><td><span class="bold-text">${b[0][0]} & ${b[1][0]}</span></td><td><span class="bold-text">${diff}</span></td></tr>`;
+          html += `<tr><td>コート ${i + 1}</td><td><span class="bold-text">${a[0][0]} & ${a[1][0]}</span></td><td><span class="bold-text">${b[0][0]} & ${b[1][0]}</span></td><td><span class="bold-text">${diff}</span></td></tr>`;
         }
 
         html += "</table>";
         fullHtml += html;
       }
 
-      fullHtml += "<h3>🏅 总上场统计</h3><table><tr><th>球员</th><th>上场次数</th></tr>";
+      fullHtml += "<h3>🏅 総出場統計</h3><table><tr><th>プレイヤー</th><th>出場回数</th></tr>";
       Object.entries(playCountMap).forEach(([name, count]) => {
         fullHtml += `<tr><td>${name}</td><td>${count}</td></tr>`;
       });
