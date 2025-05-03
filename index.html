@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -8,14 +8,14 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
-      background: #f4f4f4; /* 明るい背景 */
-      color: #000; /* テキストは黒に */
+      background: #f4f4f4;
+      color: #000;
     }
 
     header {
       display: flex;
       align-items: center;
-      background-color: rgba(255, 255, 255, 0.1); /* 背景の透明度を下げる */
+      background-color: rgba(255, 255, 255, 0.1);
       padding: 10px 20px;
       border-radius: 10px;
       margin-bottom: 20px;
@@ -122,15 +122,12 @@
       .flex-row {
         flex-direction: column;
       }
-
       h2 {
         font-size: 22px;
       }
-
       input, textarea, button {
         font-size: 16px;
       }
-
       label {
         font-size: 16px;
       }
@@ -139,6 +136,11 @@
     .bold-text {
       font-weight: bold;
       color: black;
+    }
+
+    #shareLink {
+      margin-top: 5px;
+      width: 100%;
     }
   </style>
 </head>
@@ -155,7 +157,7 @@
     <div class="flex-row">
       <div class="flex-child input-group">
         <label>プレイヤー名（1行につき1名）：</label>
-        <textarea id="playerNames" rows="3" placeholder="リンダン\LEE CHONG WEI\桃田"></textarea>
+        <textarea id="playerNames" rows="3" placeholder="LINDAN\李CHONG WEI\Momota"></textarea>
       </div>
       <div class="flex-child input-group">
         <label>レベル（初心者1、上級10、省略で自動割当）：</label>
@@ -165,21 +167,24 @@
 
     <div class="input-group">
       <label>途中参加プレイヤー名（1行につき1名）：</label>
-      <textarea id="additionalPlayers" rows="2" placeholder="追加プレイヤー名\例：LCW\西本"></textarea>
+      <textarea id="additionalPlayers" rows="2" placeholder="西本\SHI YUQI"></textarea>
     </div>
 
     <div class="flex-row">
       <div class="flex-child input-group">
-        <label>途中参加プレイヤーレベル（初心者1、上級10、省略で自動割当）：</label>
+        <label>途中参加プレイヤーレベル：</label>
         <textarea id="additionalLevels" rows="2" placeholder="7\8"></textarea>
       </div>
       <div class="flex-child input-group">
-        <label>途中参加プレイヤーの開始ラウンド（数字のみ）：</label>
+        <label>途中参加プレイヤーの開始ラウンド：</label>
         <input type="number" id="additionalCourt" placeholder="例：2">
       </div>
     </div>
 
     <button onclick="generateRounds()">🎯 対戦を生成</button>
+    <button onclick="generateShareLink()">🔗 シェアリンクを生成</button>
+    <button onclick="copyShareLink()">📋 リンクをコピー</button>
+    <input type="text" id="shareLink" readonly />
   </div>
 
   <div class="result" id="output"></div>
@@ -200,7 +205,6 @@
       ];
       let minDiff = Infinity;
       let best = null;
-
       combos.forEach(c => {
         let a = [group[c[0]], group[c[1]]];
         let b = [group[c[2]], group[c[3]]];
@@ -256,7 +260,6 @@
         });
 
         availablePlayers.sort((a, b) => playCountMap[a[0]] - playCountMap[b[0]]);
-
         const selectedPlayers = availablePlayers.slice(0, courtCount * 4);
 
         let html = `<h3>第 ${roundNumber} ラウンド</h3>`;
@@ -286,6 +289,51 @@
 
       output.innerHTML = fullHtml;
     }
+
+    function generateShareLink() {
+      const courtCount = document.getElementById("courtCount").value;
+      const totalRounds = document.getElementById("totalRounds").value;
+      const playerNames = encodeURIComponent(document.getElementById("playerNames").value.trim());
+      const playerLevels = encodeURIComponent(document.getElementById("playerLevels").value.trim());
+      const additionalPlayers = encodeURIComponent(document.getElementById("additionalPlayers").value.trim());
+      const additionalLevels = encodeURIComponent(document.getElementById("additionalLevels").value.trim());
+      const additionalCourt = document.getElementById("additionalCourt").value;
+
+      const params = new URLSearchParams({
+        court: courtCount,
+        rounds: totalRounds,
+        names: playerNames,
+        levels: playerLevels,
+        addNames: additionalPlayers,
+        addLevels: additionalLevels,
+        addStart: additionalCourt
+      });
+
+      const shareURL = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+      document.getElementById("shareLink").value = shareURL;
+    }
+
+    function copyShareLink() {
+      const linkInput = document.getElementById("shareLink");
+      linkInput.select();
+      linkInput.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("リンクをコピーしました！");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("names")) {
+        document.getElementById("courtCount").value = params.get("court") || 1;
+        document.getElementById("totalRounds").value = params.get("rounds") || 1;
+        document.getElementById("playerNames").value = decodeURIComponent(params.get("names") || "");
+        document.getElementById("playerLevels").value = decodeURIComponent(params.get("levels") || "");
+        document.getElementById("additionalPlayers").value = decodeURIComponent(params.get("addNames") || "");
+        document.getElementById("additionalLevels").value = decodeURIComponent(params.get("addLevels") || "");
+        document.getElementById("additionalCourt").value = params.get("addStart") || "";
+        generateRounds();
+      }
+    });
   </script>
 </body>
 </html>
