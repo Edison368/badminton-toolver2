@@ -155,11 +155,11 @@
     <div class="flex-row">
       <div class="flex-child input-group">
         <label>プレイヤー名（1行につき1名）：</label>
-        <textarea id="playerNames" rows="3" placeholder="リンダン\李CHONGWEI\桃田"></textarea>
+        <textarea id="playerNames" rows="3" placeholder="リンダン\LEE CHONG WEI\桃田"></textarea>
       </div>
       <div class="flex-child input-group">
         <label>レベル（初心者1、上級10、省略で自動割当）：</label>
-        <textarea id="playerLevels" rows="3" placeholder="7\n6\n8"></textarea>
+        <textarea id="playerLevels" rows="3" placeholder="7\6\8"></textarea>
       </div>
     </div>
 
@@ -171,7 +171,7 @@
     <div class="flex-row">
       <div class="flex-child input-group">
         <label>途中参加プレイヤーレベル（初心者1、上級10、省略で自動割当）：</label>
-        <textarea id="additionalLevels" rows="2" placeholder="7\n8"></textarea>
+        <textarea id="additionalLevels" rows="2" placeholder="7\8"></textarea>
       </div>
       <div class="flex-child input-group">
         <label>途中参加プレイヤーの開始ラウンド（数字のみ）：</label>
@@ -249,7 +249,7 @@
 
       let fullHtml = "";
 
-      for (let roundNumber = 1; roundNumber <= totalRounds * 2; roundNumber++) {
+      for (let roundNumber = 1; roundNumber <= totalRounds ; roundNumber++) {
         let availablePlayers = [...originalPlayers];
         lateJoiners.forEach(p => {
           if (roundNumber >= p[2]) availablePlayers.push([p[0], p[1]]);
