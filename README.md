@@ -1,2 +1,2 @@
-# badminton-toolver2
+# badminton-toolver2JPN
 バドミントン分组ツール2
