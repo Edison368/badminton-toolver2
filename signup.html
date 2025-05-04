@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>プレイヤー登録 & イベント情報</title>
+  <style>
+    /* 省略的 CSS 样式 */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🎫 イベント登録ページ</h2>
+
+    <label for="eventName">🏸 イベント名：</label>
+    <input type="text" id="eventName" placeholder="例：バドミントン交流会" />
+
+    <label for="eventTime">🕒 日時：</label>
+    <input type="text" id="eventTime" placeholder="例：2025年5月10日 14:00～17:00" />
+
+    <label for="eventPlace">📍 場所：</label>
+    <input type="text" id="eventPlace" placeholder="例：市民体育館 第2コート" />
+
+    <label for="nameInput">👥 プレイヤー名（1行につき1名）：</label>
+    <textarea id="nameInput" placeholder="例：\n田中\n佐藤\n鈴木"></textarea>
+
+    <div class="button-group">
+      <button onclick="register()">登録</button>
+      <button onclick="clearAll()">クリア</button>
+      <button onclick="goToIndex()">▶ Indexへ</button>
+    </div>
+
+    <div class="message" id="messageArea"></div>
+
+    <div class="player-list" id="playerList">
+      <h3>📋 登録済みプレイヤー</h3>
+      <ul id="playerUl"></ul>
+    </div>
+
+    <div class="player-list" id="eventInfo">
+      <h3>📌 登録済みイベント情報</h3>
+      <ul>
+        <li><strong>イベント名：</strong><span id="savedEventName">-</span></li>
+        <li><strong>日時：</strong><span id="savedEventTime">-</span></li>
+        <li><strong>場所：</strong><span id="savedEventPlace">-</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // プレイヤー情報を取得
+    function getPlayers() {
+      return JSON.parse(localStorage.getItem("players") || "[]");
+    }
+
+    // プレイヤー情報を保存
+    function setPlayers(players) {
+      localStorage.setItem("players", JSON.stringify(players));
+    }
+
+    // イベント情報を取得
+    function getEventInfo() {
+      return JSON.parse(localStorage.getItem("eventInfo") || "{}");
+    }
+
+    // イベント情報を保存
+    function setEventInfo(info) {
+      localStorage.setItem("eventInfo", JSON.stringify(info));
+    }
+
+    // 登録処理
+    function register() {
+      const input = document.getElementById("nameInput").value.trim();
+      const newNames = input.split("\n").map(name => name.trim()).filter(name => name !== "");
+
+      const eventName = document.getElementById("eventName").value.trim();
+      const eventTime = document.getElementById("eventTime").value.trim();
+      const eventPlace = document.getElementById("eventPlace").value.trim();
+
+      if (!eventName || !eventTime || !eventPlace) {
+        showMessage("⚠️ イベント情報をすべて入力してください。", true);
+        return;
+      }
+
+      if (newNames.length === 0) {
+        showMessage("⚠️ プレイヤー名を入力してください。", true);
+        return;
+      }
+
+      const existingPlayers = getPlayers();
+      const updatedPlayers = [...new Set([...existingPlayers, ...newNames])];
+      setPlayers(updatedPlayers);
+      setEventInfo({ name: eventName, time: eventTime, place: eventPlace });
+
+      showMessage("✅ 登録が完了しました！");
+      document.getElementById("nameInput").value = "";
+      updateDisplay();
+    }
+
+    // クリア処理
+    function clearAll() {
+      localStorage.removeItem("players");
+      localStorage.removeItem("eventInfo");
+      showMessage("🗑️ 全データをクリアしました。");
+      updateDisplay();
+    }
+
+    // Indexページへ移動
+    function goToIndex() {
+      const names = getPlayers().join('%0A');  // プレイヤー名を改行区切りでURLエンコード
+      window.location.href = `index.html?names=${names}`;
+    }
+
+    // 表示更新
+    function updateDisplay() {
+      // プレイヤー表示
+      const players = getPlayers();
+      const ul = document.getElementById("playerUl");
+      ul.innerHTML = "";
+      players.forEach(name => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        ul.appendChild(li);
+      });
+
+      // イベント情報表示
+      const info = getEventInfo();
+      document.getElementById("savedEventName").textContent = info.name || "-";
+      document.getElementById("savedEventTime").textContent = info.time || "-";
+      document.getElementById("savedEventPlace").textContent = info.place || "-";
+    }
+
+    // メッセージ表示
+    function showMessage(msg, isError = false) {
+      const msgArea = document.getElementById("messageArea");
+      msgArea.style.color = isError ? "red" : "green";
+      msgArea.textContent = msg;
+    }
+
+    // 初期表示
+    window.addEventListener("DOMContentLoaded", updateDisplay);
+  </script>
+</body>
+</html>
