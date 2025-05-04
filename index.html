@@ -6,141 +6,99 @@
   <title>バドミントンチーム分けツール</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 20px;
-      background: #f4f4f4;
-      color: #000;
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+      color: #333;
     }
 
     header {
-      display: flex;
-      align-items: center;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 10px 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      text-align: center;
+      padding: 20px;
+      background-color: #4CAF50;
+      color: white;
     }
 
     header img {
-      height: 50px;
-      margin-right: 15px;
+      width: 50px;
     }
 
-    h2 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: bold;
+    .inputs {
+      margin-top: 20px;
+      text-align: center;
     }
 
-    label {
-      font-weight: bold;
-      font-size: 18px;
-    }
-
-    input, button, textarea {
-      padding: 8px;
-      margin-top: 5px;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+    .inputs textarea,
+    .inputs input,
+    .inputs button {
+      padding: 10px;
+      margin: 5px;
       font-size: 16px;
     }
 
-    button {
+    .inputs button {
       background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
-      font-size: 18px;
     }
 
-    button:hover {
+    .inputs button:hover {
       background-color: #45a049;
     }
 
     table {
-      border-collapse: collapse;
       width: 100%;
+      border-collapse: collapse;
       margin-top: 20px;
-      background-color: white;
-      border-radius: 10px;
-      overflow: hidden;
     }
 
     th, td {
       border: 1px solid #ddd;
-      padding: 12px;
+      padding: 10px;
       text-align: center;
-      font-size: 16px;
     }
 
-    th {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    .result {
-      margin-top: 20px;
-      background-color: rgba(255,255,255,0.95);
-      padding: 20px;
-      border-radius: 10px;
-    }
-
-    .inputs {
-      display: flex;
-      flex-direction: column;
-      max-width: 900px;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 15px;
-    }
-
-    .input-group input, .input-group textarea {
-      width: 48%;
-    }
-
-    .flex-row {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .flex-child {
-      flex: 1;
-      min-width: 250px;
-    }
-
-    @media (max-width: 600px) {
-      .flex-row {
-        flex-direction: column;
-      }
-      h2 {
-        font-size: 22px;
-      }
-      input, textarea, button {
-        font-size: 16px;
-      }
-      label {
-        font-size: 16px;
-      }
+    h3 {
+      color: #4CAF50;
     }
 
     .bold-text {
       font-weight: bold;
-      color: black;
     }
 
-    #shareLink {
-      margin-top: 5px;
-      width: 100%;
+    .share-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .share-container input {
+      width: 70%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .share-container button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .player-list {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .player-list ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .player-list li {
+      font-size: 18px;
+      margin: 5px 0;
     }
   </style>
 </head>
@@ -151,46 +109,46 @@
   </header>
 
   <div class="inputs">
-    <label>コート数：<input type="number" id="courtCount" min="1" /></label>
-    <label>総ラウンド数：<input type="number" id="totalRounds" min="1" value="1" /></label>
-
-    <div class="flex-row">
-      <div class="flex-child input-group">
-        <label>プレイヤー名（1行につき1名）：</label>
-        <textarea id="playerNames" rows="3" placeholder="LINDAN\李CHONG WEI\Momota"></textarea>
-      </div>
-      <div class="flex-child input-group">
-        <label>レベル（初心者1、上級10、省略で自動割当）：</label>
-        <textarea id="playerLevels" rows="3" placeholder="7\6\8"></textarea>
-      </div>
+    <div>
+      <label for="playerNames">プレイヤー名 (改行で区切る):</label><br>
+      <textarea id="playerNames" rows="4" cols="50"></textarea>
     </div>
-
-    <div class="input-group">
-      <label>途中参加プレイヤー名（1行につき1名）：</label>
-      <textarea id="additionalPlayers" rows="2" placeholder="西本\SHI YUQI"></textarea>
+    <div>
+      <label for="courtCount">コート数:</label>
+      <input type="number" id="courtCount" value="1" min="1" />
     </div>
-
-    <div class="flex-row">
-      <div class="flex-child input-group">
-        <label>途中参加プレイヤーレベル：</label>
-        <textarea id="additionalLevels" rows="2" placeholder="7\8"></textarea>
-      </div>
-      <div class="flex-child input-group">
-        <label>途中参加プレイヤーの開始ラウンド：</label>
-        <input type="number" id="additionalCourt" placeholder="例：2">
-      </div>
+    <div>
+      <label for="totalRounds">ラウンド数:</label>
+      <input type="number" id="totalRounds" value="1" min="1" />
     </div>
-
+    <div>
+      <label for="additionalPlayers">途中参加プレイヤー (改行で区切る):</label><br>
+      <textarea id="additionalPlayers" rows="4" cols="50"></textarea>
+    </div>
+    <div>
+      <label for="additionalCourt">途中参加ラウンド:</label>
+      <input type="number" id="additionalCourt" value="1" min="1" />
+    </div>
     <button onclick="generateRounds()">🎯 対戦を生成</button>
     <button onclick="generateShareLink()">🔗 シェアリンクを生成</button>
     <button onclick="copyShareLink()">📋 リンクをコピー</button>
-    <input type="text" id="shareLink" readonly />
   </div>
 
   <div class="result" id="output"></div>
 
+  <div class="player-list">
+    <h3>📋 登録済みプレイヤー</h3>
+    <ul id="playerList"></ul>
+  </div>
+
+  <div class="share-container">
+    <input type="text" id="shareLink" readonly />
+  </div>
+
   <script>
     let playCountMap = {};
+    let pairHistory = {};
+    let allPairs = [];
 
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -199,82 +157,103 @@
       }
     }
 
-    function bestBalancedSplit(group) {
-      const combos = [
-        [0, 1, 2, 3], [0, 2, 1, 3], [0, 3, 1, 2]
-      ];
-      let minDiff = Infinity;
-      let best = null;
-      combos.forEach(c => {
-        let a = [group[c[0]], group[c[1]]];
-        let b = [group[c[2]], group[c[3]]];
-        let aLevel = a[0][1] + a[1][1];
-        let bLevel = b[0][1] + b[1][1];
-        let rawDiff = aLevel - bLevel;
-        let absDiff = Math.abs(rawDiff);
-        if (absDiff < minDiff) {
-          minDiff = absDiff;
-          best = [a, b, rawDiff];
-        }
-      });
-      return best;
-    }
-
     function generateRounds() {
-      const names = document.getElementById("playerNames").value.trim().split("\n");
-      const levelInput = document.getElementById("playerLevels").value.trim().split("\n");
+      const names = document.getElementById("playerNames").value.trim().split("\n").filter(n => n.trim());
+      shuffle(names); // 順番固定回避のためシャッフル
       const courtCount = parseInt(document.getElementById("courtCount").value);
       const totalRounds = parseInt(document.getElementById("totalRounds").value);
-      const additionalPlayers = document.getElementById("additionalPlayers").value.trim().split("\n");
-      const additionalLevels = document.getElementById("additionalLevels").value.trim().split("\n");
-      const additionalCourt = parseInt(document.getElementById("additionalCourt").value);
+      const additionalPlayers = document.getElementById("additionalPlayers").value.trim().split("\n").filter(n => n.trim());
+      const additionalCourt = parseInt(document.getElementById("additionalCourt").value) || 1;
       const output = document.getElementById("output");
       output.innerHTML = "";
 
-      const originalPlayers = [];
-      const lateJoiners = [];
-
-      for (let i = 0; i < names.length; i++) {
-        const name = names[i].trim();
-        let level = parseInt(levelInput[i]) || Math.floor(Math.random() * 10) + 1;
-        if (name) originalPlayers.push([name, level]);
-      }
-
-      additionalPlayers.forEach((name, index) => {
-        if (name.trim()) {
-          let level = additionalLevels[index] ? parseInt(additionalLevels[index]) : Math.floor(Math.random() * 10) + 1;
-          let startRound = additionalCourt || 1;
-          lateJoiners.push([name.trim(), level, startRound]);
-        }
-      });
+      const originalPlayers = names.map(name => name.trim());
+      const lateJoiners = additionalPlayers.map(name => ({ name: name.trim(), startRound: additionalCourt }));
 
       playCountMap = {};
-      [...originalPlayers, ...lateJoiners].forEach(p => playCountMap[p[0]] = 0);
+      pairHistory = {};
+      allPairs = [];
+      [...originalPlayers, ...lateJoiners.map(p => p.name)].forEach(p => playCountMap[p] = 0);
 
       let fullHtml = "";
 
-      for (let roundNumber = 1; roundNumber <= totalRounds ; roundNumber++) {
+      for (let roundNumber = 1; roundNumber <= totalRounds; roundNumber++) {
         let availablePlayers = [...originalPlayers];
         lateJoiners.forEach(p => {
-          if (roundNumber >= p[2]) availablePlayers.push([p[0], p[1]]);
+          if (roundNumber >= p.startRound) availablePlayers.push(p.name);
         });
 
-        availablePlayers.sort((a, b) => playCountMap[a[0]] - playCountMap[b[0]]);
+        availablePlayers.sort((a, b) => playCountMap[a] - playCountMap[b]);
         const selectedPlayers = availablePlayers.slice(0, courtCount * 4);
+        shuffle(selectedPlayers); // 偏り回避
 
         let html = `<h3>第 ${roundNumber} ラウンド</h3>`;
-        html += "<table><tr><th>コート</th><th>チーム A</th><th>チーム B</th><th>A-B 差</th></tr>";
+        html += "<table><tr><th>コート</th><th>チーム A</th><th>チーム B</th></tr>";
+
+        const used = new Set();
+
+        function findTeamPair(players, used, avoidPairs = []) {
+          const possiblePairs = [];
+
+          for (let i = 0; i < players.length; i++) {
+            if (used.has(players[i])) continue;
+            for (let j = i + 1; j < players.length; j++) {
+              if (used.has(players[j])) continue;
+              const pairKey = [players[i], players[j]].sort().join(",");
+              if (!pairHistory[pairKey] && !avoidPairs.includes(pairKey)) {
+                possiblePairs.push([players[i], players[j]]);
+              }
+            }
+          }
+
+          if (possiblePairs.length === 0) {
+            for (let i = 0; i < players.length; i++) {
+              if (used.has(players[i])) continue;
+              for (let j = i + 1; j < players.length; j++) {
+                if (used.has(players[j])) continue;
+                return [players[i], players[j]];
+              }
+            }
+          }
+
+          possiblePairs.sort((a, b) => {
+            const aKey = [a[0], a[1]].sort().join(",");
+            const bKey = [b[0], b[1]].sort().join(",");
+            return (pairHistory[aKey] || 0) - (pairHistory[bKey] || 0);
+          });
+
+          return possiblePairs[0];
+        }
+
+        if (Object.keys(pairHistory).length === selectedPlayers.length * (selectedPlayers.length - 1) / 2) {
+          pairHistory = {};
+          allPairs = [];
+        }
 
         for (let i = 0; i < courtCount; i++) {
-          let group = selectedPlayers.slice(i * 4, i * 4 + 4);
-          if (group.length < 4) {
-            html += `<tr><td>コート ${i + 1}</td><td colspan="2">自由練習</td><td>なし</td></tr>`;
+          if (selectedPlayers.length - used.size < 4) {
+            html += `<tr><td>コート ${i + 1}</td><td colspan="2">自由練習</td></tr>`;
             continue;
           }
-          const [a, b, diff] = bestBalancedSplit(group);
-          a.forEach(player => playCountMap[player[0]]++);
-          b.forEach(player => playCountMap[player[0]]++);
-          html += `<tr><td>コート ${i + 1}</td><td><span class="bold-text">${a[0][0]} & ${a[1][0]}</span></td><td><span class="bold-text">${b[0][0]} & ${b[1][0]}</span></td><td><span class="bold-text">${diff}</span></td></tr>`;
+
+          const teamA = findTeamPair(selectedPlayers, used, allPairs);
+          if (!teamA) break;
+          used.add(teamA[0]); used.add(teamA[1]);
+
+          const teamB = findTeamPair(selectedPlayers, used, allPairs);
+          if (!teamB) break;
+          used.add(teamB[0]); used.add(teamB[1]);
+
+          const aKey = [teamA[0], teamA[1]].sort().join(",");
+          const bKey = [teamB[0], teamB[1]].sort().join(",");
+          pairHistory[aKey] = (pairHistory[aKey] || 0) + 1;
+          pairHistory[bKey] = (pairHistory[bKey] || 0) + 1;
+          allPairs.push(aKey, bKey);
+
+          teamA.forEach(p => playCountMap[p]++);
+          teamB.forEach(p => playCountMap[p]++);
+
+          html += `<tr><td>コート ${i + 1}</td><td class="bold-text">${teamA.join(" & ")}</td><td class="bold-text">${teamB.join(" & ")}</td></tr>`;
         }
 
         html += "</table>";
@@ -282,31 +261,23 @@
       }
 
       fullHtml += "<h3>🏅 総出場統計</h3><table><tr><th>プレイヤー</th><th>出場回数</th></tr>";
-      Object.entries(playCountMap).forEach(([name, count]) => {
+      for (const [name, count] of Object.entries(playCountMap)) {
         fullHtml += `<tr><td>${name}</td><td>${count}</td></tr>`;
-      });
+      }
       fullHtml += "</table>";
 
       output.innerHTML = fullHtml;
     }
 
     function generateShareLink() {
-      const courtCount = document.getElementById("courtCount").value;
-      const totalRounds = document.getElementById("totalRounds").value;
-      const playerNames = encodeURIComponent(document.getElementById("playerNames").value.trim());
-      const playerLevels = encodeURIComponent(document.getElementById("playerLevels").value.trim());
-      const additionalPlayers = encodeURIComponent(document.getElementById("additionalPlayers").value.trim());
-      const additionalLevels = encodeURIComponent(document.getElementById("additionalLevels").value.trim());
-      const additionalCourt = document.getElementById("additionalCourt").value;
+      const court = document.getElementById("courtCount").value;
+      const rounds = document.getElementById("totalRounds").value;
+      const names = encodeURIComponent(document.getElementById("playerNames").value.trim());
+      const addNames = encodeURIComponent(document.getElementById("additionalPlayers").value.trim());
+      const addStart = document.getElementById("additionalCourt").value;
 
       const params = new URLSearchParams({
-        court: courtCount,
-        rounds: totalRounds,
-        names: playerNames,
-        levels: playerLevels,
-        addNames: additionalPlayers,
-        addLevels: additionalLevels,
-        addStart: additionalCourt
+        court, rounds, names, addNames, addStart
       });
 
       const shareURL = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
@@ -316,22 +287,44 @@
     function copyShareLink() {
       const linkInput = document.getElementById("shareLink");
       linkInput.select();
-      linkInput.setSelectionRange(0, 99999);
       document.execCommand("copy");
       alert("リンクをコピーしました！");
     }
 
     window.addEventListener("DOMContentLoaded", () => {
       const params = new URLSearchParams(window.location.search);
-      if (params.has("names")) {
-        document.getElementById("courtCount").value = params.get("court") || 1;
-        document.getElementById("totalRounds").value = params.get("rounds") || 1;
-        document.getElementById("playerNames").value = decodeURIComponent(params.get("names") || "");
-        document.getElementById("playerLevels").value = decodeURIComponent(params.get("levels") || "");
-        document.getElementById("additionalPlayers").value = decodeURIComponent(params.get("addNames") || "");
-        document.getElementById("additionalLevels").value = decodeURIComponent(params.get("addLevels") || "");
-        document.getElementById("additionalCourt").value = params.get("addStart") || "";
-        generateRounds();
+
+      const names = params.get("names");
+      if (names) document.getElementById("playerNames").value = decodeURIComponent(names);
+
+      const addNames = params.get("addNames");
+      if (addNames) document.getElementById("additionalPlayers").value = decodeURIComponent(addNames);
+
+      const court = params.get("court");
+      if (court) document.getElementById("courtCount").value = court;
+
+      const rounds = params.get("rounds");
+      if (rounds) document.getElementById("totalRounds").value = rounds;
+
+      const addStart = params.get("addStart");
+      if (addStart) document.getElementById("additionalCourt").value = addStart;
+
+      if (names) generateRounds(); // 自動生成
+
+      // Display players from URL
+      const playerNames = decodeURIComponent(params.get("names") || '').split("\n").filter(n => n.trim());
+      const playerListElement = document.getElementById("playerList");
+      
+      if (playerNames.length > 0) {
+        playerNames.forEach(name => {
+          const li = document.createElement("li");
+          li.textContent = name;
+          playerListElement.appendChild(li);
+        });
+      } else {
+        const li = document.createElement("li");
+        li.textContent = "まだ誰も参加していません";
+        playerListElement.appendChild(li);
       }
     });
   </script>
