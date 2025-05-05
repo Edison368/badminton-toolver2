@@ -6,99 +6,354 @@
   <title>バドミントンチーム分けツール</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f4f4f9;
-      color: #333;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+      color: #000;
     }
 
     header {
-      text-align: center;
-      padding: 20px;
-      background-color: #4CAF50;
-      color: white;
+      display: flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
     header img {
-      width: 50px;
+      height: 50px;
+      margin-right: 15px;
     }
 
-    .inputs {
-      margin-top: 20px;
-      text-align: center;
+    h2 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: bold;
     }
 
-    .inputs textarea,
-    .inputs input,
-    .inputs button {
-      padding: 10px;
-      margin: 5px;
+    label {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    input, button, textarea, select {
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
       font-size: 16px;
     }
 
-    .inputs button {
+    button {
       background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
+      font-size: 18px;
     }
 
-    .inputs button:hover {
+    button:hover {
       background-color: #45a049;
     }
 
     table {
-      width: 100%;
       border-collapse: collapse;
+      width: 100%;
       margin-top: 20px;
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     th, td {
       border: 1px solid #ddd;
-      padding: 10px;
+      padding: 12px;
       text-align: center;
+      font-size: 16px;
     }
 
-    h3 {
-      color: #4CAF50;
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .result {
+      margin-top: 20px;
+      background-color: rgba(255,255,255,0.95);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .inputs {
+      display: flex;
+      flex-direction: column;
+      max-width: 900px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    .input-group input, .input-group textarea {
+      width: 48%;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .flex-child {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    @media (max-width: 600px) {
+      .flex-row {
+        flex-direction: column;
+      }
+      h2 {
+        font-size: 22px;
+      }
+      input, textarea, button {
+        font-size: 16px;
+      }
+      label {
+        font-size: 16px;
+      }
     }
 
     .bold-text {
       font-weight: bold;
+      color: black;
     }
 
-    .share-container {
-      text-align: center;
-      margin-top: 20px;
+    #shareLink {
+      margin-top: 5px;
+      width: 100%;
     }
 
-    .share-container input {
-      width: 70%;
+    .rest-controls {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #dee2e6;
+    }
+
+    .rest-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .rest-item select, .rest-item input {
+      flex: 1;
+    }
+
+    .rest-item button {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      background-color: #dc3545;
+    }
+
+    .rest-item button:hover {
+      background-color: #c82333;
+    }
+
+    #addRestBtn {
+      background-color: #17a2b8;
+    }
+
+    #addRestBtn:hover {
+      background-color: #138496;
+    }
+
+    /* ポップアップウィンドウのスタイル */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .popup-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+
+    .close-popup {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6c757d;
+    }
+
+    .dynamics-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .court-members {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .court-box {
+      background-color: white;
+      border-radius: 8px;
       padding: 10px;
-      margin-top: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border: 1px solid #dee2e6;
     }
 
-    .share-container button {
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
+    .court-title {
+      font-weight: bold;
+      color: #2e7d32;
+      margin-bottom: 8px;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .court-round-control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .court-round-control input {
+      width: 50px;
+    }
+
+    .member-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .member-list li {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .member-list li:last-child {
+      border-bottom: none;
+    }
+
+    .free-practice {
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    /* タブ関連のスタイル */
+    .tab-container {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background-color: #e0e0e0;
       border: none;
       cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
     }
 
-    .player-list {
-      text-align: center;
-      margin-top: 20px;
+    .tab.active {
+      background-color: #4CAF50;
+      color: white;
     }
 
-    .player-list ul {
-      list-style-type: none;
-      padding-left: 0;
+    .tab-content {
+      display: none;
     }
 
-    .player-list li {
-      font-size: 18px;
-      margin: 5px 0;
+    .tab-content.active {
+      display: block;
+    }
+
+    /* プレイヤー登録テーブル */
+    .player-table {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .player-table th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .player-table td {
+      vertical-align: middle;
+    }
+
+    .player-table button {
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+
+    /* イベント情報入力フォーム */
+    .event-form {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #dee2e6;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 200px;
     }
   </style>
 </head>
@@ -108,48 +363,244 @@
     <h2>🏸 バドミントンチーム分けツール</h2>
   </header>
 
-  <div class="inputs">
-    <div>
-      <label for="playerNames">プレイヤー名 (改行で区切る):</label><br>
-      <textarea id="playerNames" rows="4" cols="50"></textarea>
-    </div>
-    <div>
-      <label for="courtCount">コート数:</label>
-      <input type="number" id="courtCount" value="1" min="1" />
-    </div>
-    <div>
-      <label for="totalRounds">ラウンド数:</label>
-      <input type="number" id="totalRounds" value="1" min="1" />
-    </div>
-    <div>
-      <label for="additionalPlayers">途中参加プレイヤー (改行で区切る):</label><br>
-      <textarea id="additionalPlayers" rows="4" cols="50"></textarea>
-    </div>
-    <div>
-      <label for="additionalCourt">途中参加ラウンド:</label>
-      <input type="number" id="additionalCourt" value="1" min="1" />
-    </div>
-    <button onclick="generateRounds()">🎯 対戦を生成</button>
-    <button onclick="generateShareLink()">🔗 シェアリンクを生成</button>
-    <button onclick="copyShareLink()">📋 リンクをコピー</button>
+  <div class="tab-container">
+    <button class="tab active" onclick="openTab(event, 'eventTab')">イベント登録</button>
+    <button class="tab" onclick="openTab(event, 'teamTab')">チーム分け</button>
   </div>
 
-  <div class="result" id="output"></div>
+  <!-- イベント登録タブ -->
+  <div id="eventTab" class="tab-content active">
+    <div class="event-form">
+      <h3>イベント情報</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>イベント名:</label>
+          <input type="text" id="eventName" placeholder="バドミントン交流会">
+        </div>
+        <div class="form-group">
+          <label>場所:</label>
+          <input type="text" id="eventLocation" placeholder="スポーツセンター">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>日付:</label>
+          <input type="date" id="eventDate">
+        </div>
+        <div class="form-group">
+          <label>時間:</label>
+          <input type="time" id="eventTime">
+        </div>
+      </div>
+    </div>
 
-  <div class="player-list">
-    <h3>📋 登録済みプレイヤー</h3>
-    <ul id="playerList"></ul>
+    <h3>プレイヤー登録</h3>
+    <div class="flex-row">
+      <div class="flex-child input-group">
+        <label>プレイヤー名:</label>
+        <input type="text" id="newPlayerName" placeholder="名前を入力">
+      </div>
+      <div class="flex-child input-group">
+        <label>レベル (1-10):</label>
+        <input type="number" id="newPlayerLevel" min="1" max="10" placeholder="1-10">
+      </div>
+    </div>
+    <button onclick="addPlayer()">プレイヤーを登録</button>
+
+    <h3>登録済みプレイヤー</h3>
+    <table class="player-table">
+      <thead>
+        <tr>
+          <th>名前</th>
+          <th>レベル</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="registeredPlayers">
+        <!-- 登録されたプレイヤーがここに表示されます -->
+      </tbody>
+    </table>
+
+    <button onclick="goToTeamDivision()" style="margin-top: 20px; background-color: #2196F3;">チーム分けページへ進む</button>
   </div>
 
-  <div class="share-container">
-    <input type="text" id="shareLink" readonly />
+  <!-- チーム分けタブ -->
+  <div id="teamTab" class="tab-content">
+    <div class="inputs">
+      <label>コート数：<input type="number" id="courtCount" min="1" /></label>
+      <label>総ラウンド数：<input type="number" id="totalRounds" min="1" value="1" /></label>
+
+      <div class="flex-row">
+        <div class="flex-child input-group">
+          <label>プレイヤー名（1行につき1名）：</label>
+          <textarea id="playerNames" rows="3" placeholder="LINDAN\李CHONG WEI\Momota"></textarea>
+        </div>
+        <div class="flex-child input-group">
+          <label>レベル（初心者1、上級10、省略で自動割当）：</label>
+          <textarea id="playerLevels" rows="3" placeholder="7\6\8"></textarea>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>途中参加プレイヤー名（1行につき1名）：</label>
+        <textarea id="additionalPlayers" rows="2" placeholder="趙六\SHI YUQI"></textarea>
+      </div>
+
+      <div class="flex-row">
+        <div class="flex-child input-group">
+          <label>途中参加プレイヤーレベル：</label>
+          <textarea id="additionalLevels" rows="2" placeholder="7\8"></textarea>
+        </div>
+        <div class="flex-child input-group">
+          <label>途中参加プレイヤーの開始ラウンド：</label>
+          <input type="number" id="additionalCourt" placeholder="例：2">
+        </div>
+      </div>
+
+      <div class="rest-controls">
+        <h3>休憩設定</h3>
+        <div id="restContainer">
+          <!-- 休憩設定項目がここに追加されます -->
+        </div>
+        <button id="addRestBtn" onclick="addRestControl()">＋ 休憩設定を追加</button>
+      </div>
+
+      <button onclick="generateRounds()">🎯 対戦を生成</button>
+      <button onclick="showCourtDynamicsPopup()">👥 コート動態を表示</button>
+      <button onclick="generateShareLink()">🔗 シェアリンクを生成</button>
+      <button onclick="copyShareLink()">📋 リンクをコピー</button>
+      <input type="text" id="shareLink" readonly />
+    </div>
+
+    <div class="result" id="output"></div>
+  </div>
+
+  <!-- ポップアップウィンドウ -->
+  <div class="popup-overlay" id="courtDynamicsPopup">
+    <div class="popup-content">
+      <div class="popup-header">
+        <div class="popup-title">コート動態表示</div>
+        <button class="close-popup" onclick="closeCourtDynamicsPopup()">×</button>
+      </div>
+      <div id="dynamicsOutput"></div>
+    </div>
   </div>
 
   <script>
     let playCountMap = {};
-    let pairHistory = {};
-    let allPairs = [];
+    let previousRoundPairs = [];
+    let restSettings = [];
+    let allRoundData = []; // 全ラウンドのデータを保存
+    let courtRoundSettings = {}; // 各コートの表示ラウンド設定
+    let registeredPlayers = []; // 登録済みプレイヤー
 
+    // タブ切り替え関数
+    function openTab(event, tabId) {
+      // すべてのタブコンテンツを非表示
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      // すべてのタブボタンのactiveクラスを削除
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      // 選択したタブを表示
+      document.getElementById(tabId).classList.add('active');
+      // タブボタンにactiveクラスを追加
+      event.currentTarget.classList.add('active');
+    }
+
+    // プレイヤーを追加
+    function addPlayer() {
+      const name = document.getElementById('newPlayerName').value.trim();
+      const level = parseInt(document.getElementById('newPlayerLevel').value);
+      
+      if (!name) {
+        alert('プレイヤー名を入力してください');
+        return;
+      }
+      
+      if (isNaN(level)) {
+        alert('レベルを正しく入力してください (1-10)');
+        return;
+      }
+      
+      // 既に登録されているかチェック
+      if (registeredPlayers.some(player => player.name === name)) {
+        alert('この名前は既に登録されています');
+        return;
+      }
+      
+      // プレイヤーを追加
+      registeredPlayers.push({ name, level });
+      updateRegisteredPlayersList();
+      
+      // 入力欄をクリア
+      document.getElementById('newPlayerName').value = '';
+      document.getElementById('newPlayerLevel').value = '';
+    }
+
+    // プレイヤーを削除
+    function removePlayer(index) {
+      registeredPlayers.splice(index, 1);
+      updateRegisteredPlayersList();
+    }
+
+    // 登録済みプレイヤーリストを更新
+    function updateRegisteredPlayersList() {
+      const tbody = document.getElementById('registeredPlayers');
+      tbody.innerHTML = '';
+      
+      registeredPlayers.forEach((player, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${player.name}</td>
+          <td>${player.level}</td>
+          <td><button onclick="removePlayer(${index})" style="background-color: #dc3545;">削除</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+      
+      // チーム分けタブのプレイヤーリストも更新
+      updateTeamDivisionPlayers();
+    }
+
+    // チーム分けタブのプレイヤーリストを更新
+    function updateTeamDivisionPlayers() {
+      const namesTextarea = document.getElementById('playerNames');
+      const levelsTextarea = document.getElementById('playerLevels');
+      
+      const names = registeredPlayers.map(player => player.name).join('\n');
+      const levels = registeredPlayers.map(player => player.level).join('\n');
+      
+      namesTextarea.value = names;
+      levelsTextarea.value = levels;
+    }
+
+    // チーム分けページへ移動
+    function goToTeamDivision() {
+      if (registeredPlayers.length === 0) {
+        alert('プレイヤーを登録してください');
+        return;
+      }
+      
+      // チーム分けタブを表示
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.getElementById('teamTab').classList.add('active');
+      
+      // タブボタンのactiveクラスを更新
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelector('.tab-container button:nth-child(2)').classList.add('active');
+      
+      // チーム分けタブのプレイヤーリストを更新
+      updateTeamDivisionPlayers();
+    }
+
+    // 以下は既存の関数（変更なし）
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -157,127 +608,348 @@
       }
     }
 
+    function bestBalancedSplit(group, avoidPairs = []) {
+      const allCombos = [
+        [0, 1, 2, 3], [0, 2, 1, 3], [0, 3, 1, 2]
+      ];
+      
+      const scoreCombo = (combo) => {
+        const pair1 = [group[combo[0]][0], group[combo[1]][0]].sort().join(',');
+        const pair2 = [group[combo[2]][0], group[combo[3]][0]].sort().join(',');
+        
+        let duplicateScore = 0;
+        if (avoidPairs.includes(pair1)) duplicateScore++;
+        if (avoidPairs.includes(pair2)) duplicateScore++;
+        
+        const aLevel = group[combo[0]][1] + group[combo[1]][1];
+        const bLevel = group[combo[2]][1] + group[combo[3]][1];
+        const levelDiff = Math.abs(aLevel - bLevel);
+        
+        return duplicateScore * 1000 + levelDiff;
+      };
+
+      const scoredCombos = allCombos.map(combo => ({
+        combo,
+        score: scoreCombo(combo)
+      }));
+
+      scoredCombos.sort((a, b) => a.score - b.score);
+      const bestCombo = scoredCombos[0].combo;
+
+      const a = [group[bestCombo[0]], group[bestCombo[1]]];
+      const b = [group[bestCombo[2]], group[bestCombo[3]]];
+      const diff = (a[0][1] + a[1][1]) - (b[0][1] + b[1][1]);
+
+      return [a, b, diff];
+    }
+
+    function addRestControl() {
+      const container = document.getElementById('restContainer');
+      const restId = Date.now();
+      
+      const restItem = document.createElement('div');
+      restItem.className = 'rest-item';
+      restItem.id = `restItem-${restId}`;
+      
+      const playerSelect = document.createElement('select');
+      playerSelect.id = `restPlayer-${restId}`;
+      playerSelect.multiple = true;
+      playerSelect.style.height = 'auto';
+      
+      const roundInput = document.createElement('input');
+      roundInput.type = 'number';
+      roundInput.id = `restRound-${restId}`;
+      roundInput.min = '1';
+      roundInput.placeholder = '休憩ラウンド';
+      
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '削除';
+      removeBtn.onclick = function() {
+        container.removeChild(restItem);
+        restSettings = restSettings.filter(item => item.id !== restId);
+      };
+      
+      restItem.appendChild(playerSelect);
+      restItem.appendChild(roundInput);
+      restItem.appendChild(removeBtn);
+      
+      container.appendChild(restItem);
+      
+      updatePlayerSelects();
+      
+      return restId;
+    }
+
+    function updatePlayerSelects() {
+      const names = document.getElementById("playerNames").value.trim().split("\n");
+      const additionalPlayers = document.getElementById("additionalPlayers").value.trim().split("\n");
+      
+      const allPlayers = [...names, ...additionalPlayers].filter(name => name.trim() !== '');
+      
+      const selects = document.querySelectorAll('select[id^="restPlayer-"]');
+      selects.forEach(select => {
+        const selectedValues = Array.from(select.selectedOptions).map(option => option.value);
+        
+        select.innerHTML = '';
+        allPlayers.forEach(player => {
+          const option = document.createElement('option');
+          option.value = player.trim();
+          option.textContent = player.trim();
+          select.appendChild(option);
+        });
+        
+        selectedValues.forEach(value => {
+          const option = Array.from(select.options).find(opt => opt.value === value);
+          if (option) option.selected = true;
+        });
+      });
+    }
+
     function generateRounds() {
-      const names = document.getElementById("playerNames").value.trim().split("\n").filter(n => n.trim());
-      shuffle(names); // 順番固定回避のためシャッフル
+      const names = document.getElementById("playerNames").value.trim().split("\n");
+      const levelInput = document.getElementById("playerLevels").value.trim().split("\n");
       const courtCount = parseInt(document.getElementById("courtCount").value);
       const totalRounds = parseInt(document.getElementById("totalRounds").value);
-      const additionalPlayers = document.getElementById("additionalPlayers").value.trim().split("\n").filter(n => n.trim());
-      const additionalCourt = parseInt(document.getElementById("additionalCourt").value) || 1;
+      const additionalPlayers = document.getElementById("additionalPlayers").value.trim().split("\n");
+      const additionalLevels = document.getElementById("additionalLevels").value.trim().split("\n");
+      const additionalCourt = parseInt(document.getElementById("additionalCourt").value);
       const output = document.getElementById("output");
       output.innerHTML = "";
 
-      const originalPlayers = names.map(name => name.trim());
-      const lateJoiners = additionalPlayers.map(name => ({ name: name.trim(), startRound: additionalCourt }));
+      collectRestSettings();
+
+      const originalPlayers = [];
+      const lateJoiners = [];
+
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i].trim();
+        let level = parseInt(levelInput[i]) || Math.floor(Math.random() * 10) + 1;
+        if (name) originalPlayers.push([name, level]);
+      }
+
+      additionalPlayers.forEach((name, index) => {
+        if (name.trim()) {
+          let level = additionalLevels[index] ? parseInt(additionalLevels[index]) : Math.floor(Math.random() * 10) + 1;
+          let startRound = additionalCourt || 1;
+          lateJoiners.push([name.trim(), level, startRound]);
+        }
+      });
 
       playCountMap = {};
-      pairHistory = {};
-      allPairs = [];
-      [...originalPlayers, ...lateJoiners.map(p => p.name)].forEach(p => playCountMap[p] = 0);
+      [...originalPlayers, ...lateJoiners].forEach(p => playCountMap[p[0]] = 0);
 
       let fullHtml = "";
+      let currentRoundPairs = [];
+      allRoundData = [];
 
       for (let roundNumber = 1; roundNumber <= totalRounds; roundNumber++) {
         let availablePlayers = [...originalPlayers];
         lateJoiners.forEach(p => {
-          if (roundNumber >= p.startRound) availablePlayers.push(p.name);
+          if (roundNumber >= p[2]) availablePlayers.push([p[0], p[1]]);
         });
 
-        availablePlayers.sort((a, b) => playCountMap[a] - playCountMap[b]);
+        const restingPlayers = getRestingPlayers(roundNumber);
+        availablePlayers = availablePlayers.filter(player => !restingPlayers.includes(player[0]));
+
+        availablePlayers.sort((a, b) => playCountMap[a[0]] - playCountMap[b[0]]);
         const selectedPlayers = availablePlayers.slice(0, courtCount * 4);
-        shuffle(selectedPlayers); // 偏り回避
 
         let html = `<h3>第 ${roundNumber} ラウンド</h3>`;
-        html += "<table><tr><th>コート</th><th>チーム A</th><th>チーム B</th></tr>";
-
-        const used = new Set();
-
-        function findTeamPair(players, used, avoidPairs = []) {
-          const possiblePairs = [];
-
-          for (let i = 0; i < players.length; i++) {
-            if (used.has(players[i])) continue;
-            for (let j = i + 1; j < players.length; j++) {
-              if (used.has(players[j])) continue;
-              const pairKey = [players[i], players[j]].sort().join(",");
-              if (!pairHistory[pairKey] && !avoidPairs.includes(pairKey)) {
-                possiblePairs.push([players[i], players[j]]);
-              }
-            }
-          }
-
-          if (possiblePairs.length === 0) {
-            for (let i = 0; i < players.length; i++) {
-              if (used.has(players[i])) continue;
-              for (let j = i + 1; j < players.length; j++) {
-                if (used.has(players[j])) continue;
-                return [players[i], players[j]];
-              }
-            }
-          }
-
-          possiblePairs.sort((a, b) => {
-            const aKey = [a[0], a[1]].sort().join(",");
-            const bKey = [b[0], b[1]].sort().join(",");
-            return (pairHistory[aKey] || 0) - (pairHistory[bKey] || 0);
-          });
-
-          return possiblePairs[0];
+        
+        if (restingPlayers.length > 0) {
+          html += `<p>休憩中のプレイヤー: ${restingPlayers.join(', ')}</p>`;
         }
+        
+        html += "<table><tr><th>コート</th><th>チーム A</th><th>チーム B</th><th>A-B 差</th></tr>";
 
-        if (Object.keys(pairHistory).length === selectedPlayers.length * (selectedPlayers.length - 1) / 2) {
-          pairHistory = {};
-          allPairs = [];
-        }
-
+        currentRoundPairs = [];
+        const roundData = {
+          roundNumber: roundNumber,
+          courts: []
+        };
+        
         for (let i = 0; i < courtCount; i++) {
-          if (selectedPlayers.length - used.size < 4) {
-            html += `<tr><td>コート ${i + 1}</td><td colspan="2">自由練習</td></tr>`;
-            continue;
+          const courtNumber = i + 1;
+          let group = selectedPlayers.slice(i * 4, i * 4 + 4);
+          const courtInfo = {
+            courtNumber: courtNumber,
+            members: [],
+            isFreePractice: false
+          };
+          
+          if (group.length < 4) {
+            html += `<tr><td>コート ${courtNumber}</td><td colspan="2">自由練習</td><td>なし</td></tr>`;
+            courtInfo.isFreePractice = true;
+          } else {
+            const [a, b, diff] = bestBalancedSplit(group, previousRoundPairs);
+            
+            const pair1 = [a[0][0], a[1][0]].sort().join(',');
+            const pair2 = [b[0][0], b[1][0]].sort().join(',');
+            currentRoundPairs.push(pair1, pair2);
+            
+            a.forEach(player => playCountMap[player[0]]++);
+            b.forEach(player => playCountMap[player[0]]++);
+            
+            html += `<tr><td>コート ${courtNumber}</td><td><span class="bold-text">${a[0][0]} & ${a[1][0]}</span></td><td><span class="bold-text">${b[0][0]} & ${b[1][0]}</span></td><td><span class="bold-text">${diff}</span></td></tr>`;
+            
+            courtInfo.members = [...a, ...b].map(p => p[0]);
           }
-
-          const teamA = findTeamPair(selectedPlayers, used, allPairs);
-          if (!teamA) break;
-          used.add(teamA[0]); used.add(teamA[1]);
-
-          const teamB = findTeamPair(selectedPlayers, used, allPairs);
-          if (!teamB) break;
-          used.add(teamB[0]); used.add(teamB[1]);
-
-          const aKey = [teamA[0], teamA[1]].sort().join(",");
-          const bKey = [teamB[0], teamB[1]].sort().join(",");
-          pairHistory[aKey] = (pairHistory[aKey] || 0) + 1;
-          pairHistory[bKey] = (pairHistory[bKey] || 0) + 1;
-          allPairs.push(aKey, bKey);
-
-          teamA.forEach(p => playCountMap[p]++);
-          teamB.forEach(p => playCountMap[p]++);
-
-          html += `<tr><td>コート ${i + 1}</td><td class="bold-text">${teamA.join(" & ")}</td><td class="bold-text">${teamB.join(" & ")}</td></tr>`;
+          
+          roundData.courts.push(courtInfo);
         }
 
         html += "</table>";
         fullHtml += html;
+        
+        previousRoundPairs = [...currentRoundPairs];
+        allRoundData.push(roundData);
       }
 
       fullHtml += "<h3>🏅 総出場統計</h3><table><tr><th>プレイヤー</th><th>出場回数</th></tr>";
-      for (const [name, count] of Object.entries(playCountMap)) {
+      Object.entries(playCountMap).forEach(([name, count]) => {
         fullHtml += `<tr><td>${name}</td><td>${count}</td></tr>`;
-      }
+      });
       fullHtml += "</table>";
 
       output.innerHTML = fullHtml;
+      
+      initializeCourtDynamics();
+    }
+
+    function initializeCourtDynamics() {
+      const courtCount = parseInt(document.getElementById("courtCount").value) || 1;
+      const totalRounds = parseInt(document.getElementById("totalRounds").value) || 1;
+      
+      courtRoundSettings = {};
+      for (let i = 1; i <= courtCount; i++) {
+        courtRoundSettings[i] = 1;
+      }
+    }
+
+    function showCourtDynamicsPopup() {
+      const popup = document.getElementById('courtDynamicsPopup');
+      popup.style.display = 'flex';
+      updateCourtDynamics();
+    }
+
+    function closeCourtDynamicsPopup() {
+      document.getElementById('courtDynamicsPopup').style.display = 'none';
+    }
+
+    function updateCourtDynamics() {
+      const courtCount = parseInt(document.getElementById("courtCount").value) || 1;
+      const dynamicsOutput = document.getElementById('dynamicsOutput');
+      
+      let html = '<div class="court-members">';
+      
+      for (let courtNumber = 1; courtNumber <= courtCount; courtNumber++) {
+        const roundNumber = courtRoundSettings[courtNumber] || 1;
+        
+        const roundData = allRoundData.find(round => round.roundNumber === roundNumber);
+        const courtData = roundData?.courts.find(court => court.courtNumber === courtNumber);
+        
+        html += '<div class="court-box">';
+        html += `<div class="court-title">
+          <span>コート ${courtNumber}</span>
+          <div class="court-round-control">
+            <button onclick="changeCourtRound(${courtNumber}, -1)">◀</button>
+            <input type="number" id="courtRoundInput-${courtNumber}" 
+                   value="${roundNumber}" min="1" 
+                   onchange="setCourtRound(${courtNumber}, this.value)">
+            <button onclick="changeCourtRound(${courtNumber}, 1)">▶</button>
+          </div>
+        </div>`;
+        
+        if (!courtData || courtData.isFreePractice) {
+          html += '<ul class="member-list"><li class="free-practice">自由練習</li></ul>';
+        } else {
+          html += '<ul class="member-list">';
+          courtData.members.forEach(member => {
+            html += `<li>${member}</li>`;
+          });
+          html += '</ul>';
+        }
+        
+        html += '</div>';
+      }
+      
+      html += '</div>';
+      dynamicsOutput.innerHTML = html;
+    }
+
+    function changeCourtRound(courtNumber, delta) {
+      const currentRound = courtRoundSettings[courtNumber] || 1;
+      const totalRounds = parseInt(document.getElementById("totalRounds").value) || 1;
+      const newRound = Math.max(1, Math.min(totalRounds, currentRound + delta));
+      
+      courtRoundSettings[courtNumber] = newRound;
+      document.getElementById(`courtRoundInput-${courtNumber}`).value = newRound;
+      updateCourtDynamics();
+    }
+
+    function setCourtRound(courtNumber, round) {
+      const totalRounds = parseInt(document.getElementById("totalRounds").value) || 1;
+      const newRound = Math.max(1, Math.min(totalRounds, parseInt(round) || 1));
+      
+      courtRoundSettings[courtNumber] = newRound;
+      updateCourtDynamics();
+    }
+
+    function collectRestSettings() {
+      restSettings = [];
+      const restItems = document.querySelectorAll('.rest-item');
+      
+      restItems.forEach(item => {
+        const id = item.id.replace('restItem-', '');
+        const playerSelect = document.getElementById(`restPlayer-${id}`);
+        const roundInput = document.getElementById(`restRound-${id}`);
+        
+        if (playerSelect && roundInput && roundInput.value) {
+          const players = Array.from(playerSelect.selectedOptions).map(option => option.value);
+          const round = parseInt(roundInput.value);
+          
+          if (players.length > 0 && !isNaN(round)) {
+            restSettings.push({
+              id: id,
+              players: players,
+              round: round
+            });
+          }
+        }
+      });
+    }
+
+    function getRestingPlayers(roundNumber) {
+      const restingPlayers = [];
+      restSettings.forEach(setting => {
+        if (setting.round === roundNumber) {
+          restingPlayers.push(...setting.players);
+        }
+      });
+      return [...new Set(restingPlayers)];
     }
 
     function generateShareLink() {
-      const court = document.getElementById("courtCount").value;
-      const rounds = document.getElementById("totalRounds").value;
-      const names = encodeURIComponent(document.getElementById("playerNames").value.trim());
-      const addNames = encodeURIComponent(document.getElementById("additionalPlayers").value.trim());
-      const addStart = document.getElementById("additionalCourt").value;
+      const courtCount = document.getElementById("courtCount").value;
+      const totalRounds = document.getElementById("totalRounds").value;
+      const playerNames = encodeURIComponent(document.getElementById("playerNames").value.trim());
+      const playerLevels = encodeURIComponent(document.getElementById("playerLevels").value.trim());
+      const additionalPlayers = encodeURIComponent(document.getElementById("additionalPlayers").value.trim());
+      const additionalLevels = encodeURIComponent(document.getElementById("additionalLevels").value.trim());
+      const additionalCourt = document.getElementById("additionalCourt").value;
+
+      collectRestSettings();
+      const restSettingsJson = encodeURIComponent(JSON.stringify(restSettings));
 
       const params = new URLSearchParams({
-        court, rounds, names, addNames, addStart
+        court: courtCount,
+        rounds: totalRounds,
+        names: playerNames,
+        levels: playerLevels,
+        addNames: additionalPlayers,
+        addLevels: additionalLevels,
+        addStart: additionalCourt,
+        restSettings: restSettingsJson
       });
 
       const shareURL = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
@@ -287,45 +959,69 @@
     function copyShareLink() {
       const linkInput = document.getElementById("shareLink");
       linkInput.select();
+      linkInput.setSelectionRange(0, 99999);
       document.execCommand("copy");
       alert("リンクをコピーしました！");
     }
 
+    function loadRestSettings(settings) {
+      const container = document.getElementById('restContainer');
+      container.innerHTML = '';
+      
+      settings.forEach(setting => {
+        const restId = addRestControl();
+        
+        const playerSelect = document.getElementById(`restPlayer-${restId}`);
+        const roundInput = document.getElementById(`restRound-${restId}`);
+        
+        if (playerSelect && roundInput) {
+          setting.players.forEach(player => {
+            const option = Array.from(playerSelect.options).find(opt => opt.value === player);
+            if (option) option.selected = true;
+          });
+          
+          roundInput.value = setting.round;
+        }
+      });
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       const params = new URLSearchParams(window.location.search);
-
-      const names = params.get("names");
-      if (names) document.getElementById("playerNames").value = decodeURIComponent(names);
-
-      const addNames = params.get("addNames");
-      if (addNames) document.getElementById("additionalPlayers").value = decodeURIComponent(addNames);
-
-      const court = params.get("court");
-      if (court) document.getElementById("courtCount").value = court;
-
-      const rounds = params.get("rounds");
-      if (rounds) document.getElementById("totalRounds").value = rounds;
-
-      const addStart = params.get("addStart");
-      if (addStart) document.getElementById("additionalCourt").value = addStart;
-
-      if (names) generateRounds(); // 自動生成
-
-      // Display players from URL
-      const playerNames = decodeURIComponent(params.get("names") || '').split("\n").filter(n => n.trim());
-      const playerListElement = document.getElementById("playerList");
-      
-      if (playerNames.length > 0) {
-        playerNames.forEach(name => {
-          const li = document.createElement("li");
-          li.textContent = name;
-          playerListElement.appendChild(li);
+      if (params.has("names")) {
+        document.getElementById("courtCount").value = params.get("court") || 1;
+        document.getElementById("totalRounds").value = params.get("rounds") || 1;
+        document.getElementById("playerNames").value = decodeURIComponent(params.get("names") || "");
+        document.getElementById("playerLevels").value = decodeURIComponent(params.get("levels") || "");
+        document.getElementById("additionalPlayers").value = decodeURIComponent(params.get("addNames") || "");
+        document.getElementById("additionalLevels").value = decodeURIComponent(params.get("addLevels") || "");
+        document.getElementById("additionalCourt").value = params.get("addStart") || "";
+        
+        if (params.has("restSettings")) {
+          try {
+            const restSettings = JSON.parse(decodeURIComponent(params.get("restSettings")));
+            if (Array.isArray(restSettings)) {
+              loadRestSettings(restSettings);
+            }
+          } catch (e) {
+            console.error("休憩設定の読み込みに失敗しました", e);
+          }
+        }
+        
+        document.querySelectorAll('.tab-content').forEach(tab => {
+          tab.classList.remove('active');
         });
-      } else {
-        const li = document.createElement("li");
-        li.textContent = "まだ誰も参加していません";
-        playerListElement.appendChild(li);
+        document.getElementById('teamTab').classList.add('active');
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        document.querySelector('.tab-container button:nth-child(2)').classList.add('active');
+        
+        generateRounds();
       }
+      
+      document.getElementById("playerNames").addEventListener("input", updatePlayerSelects);
+      document.getElementById("additionalPlayers").addEventListener("input", updatePlayerSelects);
     });
   </script>
 </body>
