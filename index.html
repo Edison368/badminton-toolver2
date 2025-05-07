@@ -1,0 +1,2022 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>バドミントンチーム分けツール</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+      color: #000;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    header img {
+      height: 50px;
+      margin-right: 15px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    input, button, textarea, select {
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .result {
+      margin-top: 20px;
+      background-color: rgba(255,255,255,0.95);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .inputs {
+      display: flex;
+      flex-direction: column;
+      max-width: 900px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    .input-group input, .input-group textarea {
+      width: 48%;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .flex-child {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    @media (max-width: 600px) {
+      .flex-row {
+        flex-direction: column;
+      }
+      h2 {
+        font-size: 22px;
+      }
+      input, textarea, button {
+        font-size: 16px;
+      }
+      label {
+        font-size: 16px;
+      }
+    }
+
+    .bold-text {
+      font-weight: bold;
+      color: black;
+    }
+
+    #shareLink {
+      margin-top: 5px;
+      width: 100%;
+    }
+
+    .rest-controls {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #dee2e6;
+    }
+
+    .rest-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .rest-item select, .rest-item input {
+      flex: 1;
+    }
+
+    .rest-item button {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      background-color: #dc3545;
+    }
+
+    .rest-item button:hover {
+      background-color: #c82333;
+    }
+
+    #addRestBtn {
+      background-color: #17a2b8;
+    }
+
+    #addRestBtn:hover {
+      background-color: #138496;
+    }
+
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .popup-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+
+    .close-popup {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6c757d;
+    }
+
+    .dynamics-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .court-members {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .court-box {
+      background-color: white;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border: 1px solid #dee2e6;
+    }
+
+    .court-title {
+      font-weight: bold;
+      color: #2e7d32;
+      margin-bottom: 8px;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .court-round-control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .court-round-control input {
+      width: 50px;
+    }
+
+    .member-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .member-list li {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .member-list li:last-child {
+      border-bottom: none;
+    }
+
+    .free-practice {
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    .tab-container {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background-color: #e0e0e0;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    .tab.active {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .player-table {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .player-table th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .player-table td {
+      vertical-align: middle;
+    }
+
+    .player-table button {
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+
+    .event-form {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #dee2e6;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .pairing-stats {
+      margin-top: 20px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    
+    .pairing-stats h3 {
+      margin-top: 0;
+    }
+    
+    .pairing-type {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 5px;
+    }
+    
+    .pairing-type.men {
+      background-color: #2196F3;
+      color: white;
+    }
+    
+    .pairing-type.women {
+      background-color: #E91E63;
+      color: white;
+    }
+    
+    .pairing-type.mix {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+    .generation-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .generation-buttons button {
+      flex: 1;
+      min-width: 150px;
+    }
+    
+    #generateAny {
+      background-color: #9E9E9E;
+    }
+    
+    #generateMix {
+      background-color: #4CAF50;
+    }
+    
+    #generateMen {
+      background-color: #2196F3;
+    }
+    
+    #generateWomen {
+      background-color: #E91E63;
+    }
+    
+    .new-window-btn {
+      background-color: #673AB7;
+      margin-top: 10px;
+    }
+    
+    .warning-message {
+      color: #d32f2f;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    
+    .level-diff-warning {
+      color: #FF9800;
+      font-weight: bold;
+    }
+    
+    .player-count-info {
+      background-color: #e3f2fd;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    
+    .remaining-players {
+      color: #616161;
+      font-style: italic;
+      margin-top: 5px;
+    }
+    
+    /* レベルスライダーのスタイル */
+    .level-slider-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .level-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 10px;
+      border-radius: 5px;
+      background: #d3d3d3;
+      outline: none;
+    }
+    
+    .level-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #4CAF50;
+      cursor: pointer;
+    }
+    
+    .level-slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #4CAF50;
+      cursor: pointer;
+    }
+    
+    .level-marks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: -10px;
+    }
+    
+    .level-mark {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .level-value {
+      min-width: 30px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaFxuFtnA0V3zsmO_XSDUVFhbErsh_851E8w&s" alt="Logo">
+    <h2>🏸 バドミントンチーム分けツール</h2>
+  </header>
+
+  <div class="tab-container">
+    <button class="tab active" onclick="openTab(event, 'eventTab')">イベント登録</button>
+    <button class="tab" onclick="openTab(event, 'teamTab')">チーム分け</button>
+  </div>
+
+  <!-- イベント登録タブ -->
+  <div id="eventTab" class="tab-content active">
+    <div class="event-form">
+      <h3>イベント情報</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>イベント名:</label>
+          <input type="text" id="eventName" placeholder="バドミントン交流会">
+        </div>
+        <div class="form-group">
+          <label>場所:</label>
+          <input type="text" id="eventLocation" placeholder="スポーツセンター">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>日付:</label>
+          <input type="date" id="eventDate">
+        </div>
+        <div class="form-group">
+          <label>時間:</label>
+          <input type="time" id="eventTime">
+        </div>
+      </div>
+    </div>
+
+    <h3>プレイヤー登録</h3>
+    <div class="flex-row">
+      <div class="flex-child input-group">
+        <label>プレイヤー名:</label>
+        <input type="text" id="newPlayerName" placeholder="名前を入力">
+      </div>
+      <div class="flex-child input-group">
+        <label>レベル:</label>
+        <div class="level-slider-container">
+          <input type="range" id="newPlayerLevel" class="level-slider" min="1" max="5" value="3" step="1">
+          <span id="levelDisplay" class="level-value">3</span>
+        </div>
+        <div class="level-marks">
+          <span class="level-mark">初心者</span>
+          <span class="level-mark">中級</span>
+          <span class="level-mark">上級</span>
+        </div>
+      </div>
+      <div class="flex-child input-group">
+        <label>性別:</label>
+        <select id="newPlayerGender">
+          <option value="male">男性</option>
+          <option value="female">女性</option>
+        </select>
+      </div>
+    </div>
+    <button onclick="addPlayer()">プレイヤーを登録</button>
+
+    <h3>登録済みプレイヤー</h3>
+    <table class="player-table">
+      <thead>
+        <tr>
+          <th>名前</th>
+          <th>レベル</th>
+          <th>性別</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="registeredPlayers">
+        <!-- 登録されたプレイヤーがここに表示されます -->
+      </tbody>
+    </table>
+
+    <button onclick="goToTeamDivision()" style="margin-top: 20px; background-color: #2196F3;">チーム分けページへ進む</button>
+  </div>
+
+  <!-- チーム分けタブ -->
+  <div id="teamTab" class="tab-content">
+    <div class="inputs">
+      <label>コート数：<input type="number" id="courtCount" min="1" /></label>
+      <label>総ラウンド数：<input type="number" id="totalRounds" min="1" value="1" /></label>
+
+      <div class="flex-row">
+        <div class="flex-child input-group">
+          <label>プレイヤー名（1行につき1名）：</label>
+          <textarea id="playerNames" rows="3" placeholder="李雨辰\n张馨月\n崔嘉言\n蒋梓睿\n白昊天\n唐芷若\n林语嫣\n韩子豪\n郭\n林ダン\nLCW\n桃田\n山口あかね\n宮崎友香\nなお\nかおり\n原玲か\nキム\n橋"></textarea>
+        </div>
+        <div class="flex-child input-group">
+          <label>レベル（1-5、省略で自動割当）：</label>
+          <textarea id="playerLevels" rows="3" placeholder="3\n2\n4\n2\n3\n2\n2\n4\n3\n5\n5\n4\n3\n2\n2\n2\n3\n4\n2"></textarea>
+        </div>
+        <div class="flex-child input-group">
+          <label>性別（male/female、1行につき1名）：</label>
+          <textarea id="playerGenders" rows="3" placeholder="male\nfemale\nmale\nfemale\nmale\nfemale\nfemale\nmale\nmale\nmale\nmale\nmale\nfemale\nfemale\nfemale\nfemale\nfemale\nfemale\nfemale"></textarea>
+        </div>
+      </div>
+
+      <div class="rest-controls">
+        <h3>休憩設定</h3>
+        <div id="restContainer">
+          <!-- 休憩設定項目がここに追加されます -->
+        </div>
+        <button id="addRestBtn" onclick="addRestControl()">＋ 休憩設定を追加</button>
+      </div>
+
+      <div class="generation-buttons">
+        <button id="generateAny" onclick="generateRounds('any')">なんでも生成</button>
+        <button id="generateMix" onclick="generateRounds('mix')">ミックスダブルス生成</button>
+        <button id="generateMen" onclick="generateRounds('men')">男子ダブルス生成</button>
+        <button id="generateWomen" onclick="generateRounds('women')">女子ダブルス生成</button>
+      </div>
+
+      <button onclick="showCourtDynamicsPopup()">👥 コート動態を表示</button>
+      <button onclick="exportToExcel()" style="background-color: #2196F3;">📊 Excelにエクスポート</button>
+      <button onclick="generateShareLink()">🔗 シェアリンクを生成</button>
+      <button onclick="copyShareLink()">📋 リンクをコピー</button>
+      <input type="text" id="shareLink" readonly />
+      
+      <!-- 新しいウィンドウで開くボタン -->
+      <button class="new-window-btn" onclick="openInNewWindow('any')">🖥️ なんでも生成 (新規ウィンドウ)</button>
+      <button class="new-window-btn" onclick="openInNewWindow('mix')">🖥️ ミックスダブルス (新規ウィンドウ)</button>
+      <button class="new-window-btn" onclick="openInNewWindow('men')">🖥️ 男子ダブルス (新規ウィンドウ)</button>
+      <button class="new-window-btn" onclick="openInNewWindow('women')">🖥️ 女子ダブルス (新規ウィンドウ)</button>
+    </div>
+
+    <div class="result" id="output"></div>
+  </div>
+
+  <!-- ポップアップウィンドウ -->
+  <div class="popup-overlay" id="courtDynamicsPopup">
+    <div class="popup-content">
+      <div class="popup-header">
+        <div class="popup-title">コート動態表示</div>
+        <button class="close-popup" onclick="closeCourtDynamicsPopup()">×</button>
+      </div>
+      <div id="dynamicsOutput"></div>
+    </div>
+  </div>
+
+  <div style="margin: 20px 0;">
+    <button onclick="saveData()" style="background-color: #ff9800;">💾 データを保存</button>
+    <button onclick="loadData()" style="background-color: #ff9800;">📂 データを読み込み</button>
+    <button onclick="exportData()" style="background-color: #ff5722;">📤 エクスポート</button>
+    <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display: none;">
+    <button onclick="document.getElementById('importFile').click()" style="background-color: #ff5722;">📥 インポート</button>
+  </div>
+
+  <script>
+    let playCountMap = {};
+    let allPreviousPairs = [];
+    let pairingCounts = {};
+    let restSettings = [];
+    let allRoundData = [];
+    let courtRoundSettings = {};
+    let registeredPlayers = [];
+    let currentPairingType = 'any';
+    let pairingHistory = {};
+    let playerLevelSumMap = {};
+    let allPossiblePairs = [];
+    let currentShareData = null;
+
+    function openTab(event, tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function addPlayer() {
+      const name = document.getElementById('newPlayerName').value.trim();
+      const level = parseInt(document.getElementById('newPlayerLevel').value);
+      const gender = document.getElementById('newPlayerGender').value;
+      
+      if (!name) {
+        alert('プレイヤー名を入力してください');
+        return;
+      }
+      
+      if (isNaN(level) || level < 1 || level > 5) {
+        alert('レベルを正しく入力してください (1-5)');
+        return;
+      }
+      
+      if (registeredPlayers.some(player => player.name === name)) {
+        alert('この名前は既に登録されています');
+        return;
+      }
+      
+      registeredPlayers.push({ name, level, gender });
+      updateRegisteredPlayersList();
+      
+      document.getElementById('newPlayerName').value = '';
+      document.getElementById('newPlayerLevel').value = '3';
+      document.getElementById('levelDisplay').textContent = '3';
+    }
+
+    function removePlayer(index) {
+      registeredPlayers.splice(index, 1);
+      updateRegisteredPlayersList();
+    }
+
+    function updateRegisteredPlayersList() {
+      const tbody = document.getElementById('registeredPlayers');
+      tbody.innerHTML = '';
+      
+      let maleCount = 0;
+      let femaleCount = 0;
+      
+      registeredPlayers.forEach((player, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${player.name}</td>
+          <td>${player.level}</td>
+          <td>${player.gender === 'male' ? '男性' : '女性'}</td>
+          <td><button onclick="removePlayer(${index})" style="background-color: #dc3545;">削除</button></td>
+        `;
+        tbody.appendChild(row);
+        
+        if (player.gender === 'male') maleCount++;
+        else femaleCount++;
+      });
+      
+      const countInfo = document.createElement('div');
+      countInfo.className = 'player-count-info';
+      countInfo.innerHTML = `
+        登録プレイヤー: 男性 ${maleCount}人, 女性 ${femaleCount}人, 合計 ${registeredPlayers.length}人
+      `;
+      tbody.parentNode.insertBefore(countInfo, tbody);
+      
+      updateTeamDivisionPlayers();
+    }
+
+    function updateTeamDivisionPlayers() {
+      const namesTextarea = document.getElementById('playerNames');
+      const levelsTextarea = document.getElementById('playerLevels');
+      const gendersTextarea = document.getElementById('playerGenders');
+      
+      const names = registeredPlayers.map(player => player.name).join('\n');
+      const levels = registeredPlayers.map(player => player.level).join('\n');
+      const genders = registeredPlayers.map(player => player.gender).join('\n');
+      
+      namesTextarea.value = names;
+      levelsTextarea.value = levels;
+      gendersTextarea.value = genders;
+    }
+
+    function goToTeamDivision() {
+      if (registeredPlayers.length === 0) {
+        alert('プレイヤーを登録してください');
+        return;
+      }
+      
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.getElementById('teamTab').classList.add('active');
+      
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelector('.tab-container button:nth-child(2)').classList.add('active');
+      
+      updateTeamDivisionPlayers();
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function initializePairingCounts(players) {
+      pairingCounts = {};
+      pairingHistory = {};
+      playerLevelSumMap = {};
+      allPossiblePairs = [];
+      
+      for (let i = 0; i < players.length; i++) {
+        for (let j = i + 1; j < players.length; j++) {
+          const pair = [players[i].name, players[j].name].sort().join(' & ');
+          pairingCounts[pair] = 0;
+          pairingHistory[pair] = [];
+          playerLevelSumMap[pair] = players[i].level + players[j].level;
+          allPossiblePairs.push(pair);
+        }
+      }
+    }
+
+    function getPairingType(pair, players) {
+      const player1 = players.find(p => p.name === pair[0]);
+      const player2 = players.find(p => p.name === pair[1]);
+      
+      if (!player1 || !player2) return 'unknown';
+      
+      if (player1.gender === 'male' && player2.gender === 'male') return 'men';
+      if (player1.gender === 'female' && player2.gender === 'female') return 'women';
+      return 'mix';
+    }
+
+    function createPairs(players, allPlayers, pairingType) {
+      // 未対戦ペアを優先的に選択するためのロジック
+      const getUnpairedScore = (pair) => {
+        const pairKey = pair.sort().join(' & ');
+        const count = pairingCounts[pairKey] || 0;
+        const isUnpaired = count === 0;
+        return isUnpaired ? -1000 : 0; // 未対戦ペアに大きなボーナス
+      };
+
+      if (pairingType === 'men') {
+        const malePlayers = players.filter(p => {
+          const player = allPlayers.find(ap => ap.name === p[0]);
+          return player && player.gender === 'male';
+        });
+        
+        if (malePlayers.length < 4) {
+          return [[], [], 0, '', ''];
+        }
+        
+        const allCombos = [
+          [0, 1, 2, 3], [0, 2, 1, 3], [0, 3, 1, 2]
+        ];
+        
+        const scoreCombo = (combo) => {
+          const pair1 = [malePlayers[combo[0]][0], malePlayers[combo[1]][0]];
+          const pair2 = [malePlayers[combo[2]][0], malePlayers[combo[3]][0]];
+          
+          const pair1Key = pair1.sort().join(' & ');
+          const pair2Key = pair2.sort().join(' & ');
+          
+          const pair1Count = pairingCounts[pair1Key] || 0;
+          const pair2Count = pairingCounts[pair2Key] || 0;
+          
+          // 未対戦ペアを優先
+          const unpairedScore = getUnpairedScore(pair1) + getUnpairedScore(pair2);
+          
+          // 同じペアが連続しないようにする
+          const pairingScore = (pair1Count + pair2Count) * 100;
+          
+          // 同じコートで連続しないようにする
+          let courtDuplicateScore = 0;
+          if (allPreviousPairs.includes(pair1Key)) courtDuplicateScore += 50;
+          if (allPreviousPairs.includes(pair2Key)) courtDuplicateScore += 50;
+          
+          // レベル差を考慮
+          const aLevel = malePlayers[combo[0]][1] + malePlayers[combo[1]][1];
+          const bLevel = malePlayers[combo[2]][1] + malePlayers[combo[3]][1];
+          const levelDiff = Math.abs(aLevel - bLevel) * 10;
+          
+          return unpairedScore + pairingScore + courtDuplicateScore + levelDiff;
+        };
+
+        const scoredCombos = allCombos.map(combo => ({
+          combo,
+          score: scoreCombo(combo)
+        }));
+
+        scoredCombos.sort((a, b) => a.score - b.score);
+        const bestCombo = scoredCombos[0].combo;
+
+        return [
+          [malePlayers[bestCombo[0]], malePlayers[bestCombo[1]]],
+          [malePlayers[bestCombo[2]], malePlayers[bestCombo[3]]],
+          malePlayers[bestCombo[0]][1] + malePlayers[bestCombo[1]][1] - malePlayers[bestCombo[2]][1] - malePlayers[bestCombo[3]][1],
+          'men',
+          'men'
+        ];
+      } else if (pairingType === 'women') {
+        const femalePlayers = players.filter(p => {
+          const player = allPlayers.find(ap => ap.name === p[0]);
+          return player && player.gender === 'female';
+        });
+        
+        if (femalePlayers.length < 4) {
+          return [[], [], 0, '', ''];
+        }
+        
+        const allCombos = [
+          [0, 1, 2, 3], [0, 2, 1, 3], [0, 3, 1, 2]
+        ];
+        
+        const scoreCombo = (combo) => {
+          const pair1 = [femalePlayers[combo[0]][0], femalePlayers[combo[1]][0]];
+          const pair2 = [femalePlayers[combo[2]][0], femalePlayers[combo[3]][0]];
+          
+          const pair1Key = pair1.sort().join(' & ');
+          const pair2Key = pair2.sort().join(' & ');
+          
+          const pair1Count = pairingCounts[pair1Key] || 0;
+          const pair2Count = pairingCounts[pair2Key] || 0;
+          
+          // 未対戦ペアを優先
+          const unpairedScore = getUnpairedScore(pair1) + getUnpairedScore(pair2);
+          
+          const pairingScore = (pair1Count + pair2Count) * 100;
+          
+          let courtDuplicateScore = 0;
+          if (allPreviousPairs.includes(pair1Key)) courtDuplicateScore += 50;
+          if (allPreviousPairs.includes(pair2Key)) courtDuplicateScore += 50;
+          
+          const aLevel = femalePlayers[combo[0]][1] + femalePlayers[combo[1]][1];
+          const bLevel = femalePlayers[combo[2]][1] + femalePlayers[combo[3]][1];
+          const levelDiff = Math.abs(aLevel - bLevel) * 10;
+          
+          return unpairedScore + pairingScore + courtDuplicateScore + levelDiff;
+        };
+
+        const scoredCombos = allCombos.map(combo => ({
+          combo,
+          score: scoreCombo(combo)
+        }));
+
+        scoredCombos.sort((a, b) => a.score - b.score);
+        const bestCombo = scoredCombos[0].combo;
+
+        return [
+          [femalePlayers[bestCombo[0]], femalePlayers[bestCombo[1]]],
+          [femalePlayers[bestCombo[2]], femalePlayers[bestCombo[3]]],
+          femalePlayers[bestCombo[0]][1] + femalePlayers[bestCombo[1]][1] - femalePlayers[bestCombo[2]][1] - femalePlayers[bestCombo[3]][1],
+          'women',
+          'women'
+        ];
+      } else if (pairingType === 'mix') {
+        const malePlayers = players.filter(p => {
+          const player = allPlayers.find(ap => ap.name === p[0]);
+          return player && player.gender === 'male';
+        });
+        
+        const femalePlayers = players.filter(p => {
+          const player = allPlayers.find(ap => ap.name === p[0]);
+          return player && player.gender === 'female';
+        });
+        
+        const minPairs = Math.min(malePlayers.length, femalePlayers.length);
+        if (minPairs < 2) {
+          return [[], [], 0, '', ''];
+        }
+        
+        const allCombos = [];
+        for (let i = 0; i < Math.min(2, malePlayers.length); i++) {
+          for (let j = 0; j < Math.min(2, femalePlayers.length); j++) {
+            if (i !== j) {
+              allCombos.push([i, j]);
+            }
+          }
+        }
+        
+        const scoreCombo = (combo) => {
+          const pair1 = [malePlayers[combo[0]][0], femalePlayers[combo[0]][0]];
+          const pair2 = [malePlayers[combo[1]][0], femalePlayers[combo[1]][0]];
+          
+          const pair1Key = pair1.sort().join(' & ');
+          const pair2Key = pair2.sort().join(' & ');
+          
+          const pair1Count = pairingCounts[pair1Key] || 0;
+          const pair2Count = pairingCounts[pair2Key] || 0;
+          
+          // 未対戦ペアを優先
+          const unpairedScore = getUnpairedScore(pair1) + getUnpairedScore(pair2);
+          
+          const pairingScore = (pair1Count + pair2Count) * 100;
+          
+          let courtDuplicateScore = 0;
+          if (allPreviousPairs.includes(pair1Key)) courtDuplicateScore += 50;
+          if (allPreviousPairs.includes(pair2Key)) courtDuplicateScore += 50;
+          
+          const aLevel = malePlayers[combo[0]][1] + femalePlayers[combo[0]][1];
+          const bLevel = malePlayers[combo[1]][1] + femalePlayers[combo[1]][1];
+          const levelDiff = Math.abs(aLevel - bLevel) * 10;
+          
+          return unpairedScore + pairingScore + courtDuplicateScore + levelDiff;
+        };
+
+        const scoredCombos = allCombos.map(combo => ({
+          combo,
+          score: scoreCombo(combo)
+        }));
+
+        scoredCombos.sort((a, b) => a.score - b.score);
+        const bestCombo = scoredCombos[0].combo;
+
+        return [
+          [malePlayers[bestCombo[0]], femalePlayers[bestCombo[0]]],
+          [malePlayers[bestCombo[1]], femalePlayers[bestCombo[1]]],
+          malePlayers[bestCombo[0]][1] + femalePlayers[bestCombo[0]][1] - malePlayers[bestCombo[1]][1] - femalePlayers[bestCombo[1]][1],
+          'mix',
+          'mix'
+        ];
+      } else {
+        const allCombos = [
+          [0, 1, 2, 3], [0, 2, 1, 3], [0, 3, 1, 2]
+        ];
+        
+        const scoreCombo = (combo) => {
+          const pair1 = [players[combo[0]][0], players[combo[1]][0]];
+          const pair2 = [players[combo[2]][0], players[combo[3]][0]];
+          
+          const pair1Key = pair1.sort().join(' & ');
+          const pair2Key = pair2.sort().join(' & ');
+          
+          const pair1Count = pairingCounts[pair1Key] || 0;
+          const pair2Count = pairingCounts[pair2Key] || 0;
+          
+          // 未対戦ペアを優先
+          const unpairedScore = getUnpairedScore(pair1) + getUnpairedScore(pair2);
+          
+          const pairingScore = (pair1Count + pair2Count) * 100;
+          
+          let courtDuplicateScore = 0;
+          if (allPreviousPairs.includes(pair1Key)) courtDuplicateScore += 50;
+          if (allPreviousPairs.includes(pair2Key)) courtDuplicateScore += 50;
+          
+          const aLevel = players[combo[0]][1] + players[combo[1]][1];
+          const bLevel = players[combo[2]][1] + players[combo[3]][1];
+          const levelDiff = Math.abs(aLevel - bLevel) * 10;
+          
+          return unpairedScore + pairingScore + courtDuplicateScore + levelDiff;
+        };
+
+        const scoredCombos = allCombos.map(combo => ({
+          combo,
+          score: scoreCombo(combo)
+        }));
+
+        scoredCombos.sort((a, b) => a.score - b.score);
+        const bestCombo = scoredCombos[0].combo;
+
+        const a = [players[bestCombo[0]], players[bestCombo[1]]];
+        const b = [players[bestCombo[2]], players[bestCombo[3]]];
+        const diff = (a[0][1] + a[1][1]) - (b[0][1] + b[1][1]);
+        const pair1Type = getPairingType([a[0][0], a[1][0]], allPlayers);
+        const pair2Type = getPairingType([b[0][0], b[1][0]], allPlayers);
+
+        return [a, b, diff, pair1Type, pair2Type];
+      }
+    }
+
+    function createMatchRow(courtNumber, a, b, diff, pair1Type, pair2Type, pairingTypeText) {
+      const pair1TypeClass = pair1Type === 'men' ? 'men' : pair1Type === 'women' ? 'women' : 'mix';
+      const pair2TypeClass = pair2Type === 'men' ? 'men' : pair2Type === 'women' ? 'women' : 'mix';
+      
+      const diffWarning = Math.abs(diff) > 3 ? `<span class="level-diff-warning"> (差が大きい!)</span>` : '';
+      
+      return `<tr>
+        <td>コート ${courtNumber}</td>
+        <td><span class="bold-text">${a[0][0]} & ${a[1][0]} <span class="pairing-type ${pair1TypeClass}">${pair1Type === 'men' ? '男子' : pair1Type === 'women' ? '女子' : 'ミックス'}</span></span></td>
+        <td><span class="bold-text">${b[0][0]} & ${b[1][0]} <span class="pairing-type ${pair2TypeClass}">${pair2Type === 'men' ? '男子' : pair2Type === 'women' ? '女子' : 'ミックス'}</span></span></td>
+        <td><span class="bold-text">${diff}${diffWarning}</span></td>
+        <td>${pairingTypeText}</td>
+      </tr>`;
+    }
+
+    function createStatistics(playCountMap, pairingCounts, allPlayers, currentPairingType) {
+      let html = "<h3>🏅 総出場統計</h3><table><tr><th>プレイヤー</th><th>出場回数</th></tr>";
+      Object.entries(playCountMap).forEach(([name, count]) => {
+        html += `<tr><td>${name}</td><td>${count}</td></tr>`;
+      });
+      html += "</table>";
+
+      html += `<div class="pairing-stats"><h3>🤝 ペアリング統計 (${getPairingTypeName(currentPairingType)})</h3>`;
+      html += "<table><tr><th>ペア</th><th>タイプ</th><th>組み合わせ回数</th><th>レベル合計</th></tr>";
+      
+      const sortedPairs = allPossiblePairs.sort((a, b) => {
+        // 未対戦ペアを先に表示
+        if (pairingCounts[a] === 0 && pairingCounts[b] > 0) return -1;
+        if (pairingCounts[a] > 0 && pairingCounts[b] === 0) return 1;
+        // その後は対戦回数が少ない順
+        return (pairingCounts[a] || 0) - (pairingCounts[b] || 0);
+      });
+      
+      sortedPairs.forEach(pair => {
+        const [player1, player2] = pair.split(' & ');
+        const player1Data = allPlayers.find(p => p.name === player1);
+        const player2Data = allPlayers.find(p => p.name === player2);
+        let pairType = 'unknown';
+        
+        if (player1Data && player2Data) {
+          if (player1Data.gender === 'male' && player2Data.gender === 'male') {
+            pairType = '男子';
+          } else if (player1Data.gender === 'female' && player2Data.gender === 'female') {
+            pairType = '女子';
+          } else {
+            pairType = 'ミックス';
+          }
+        }
+        
+        const count = pairingCounts[pair] || 0;
+        const levelSum = playerLevelSumMap[pair] || (player1Data?.level || 0) + (player2Data?.level || 0);
+        
+        // 未対戦ペアは強調表示
+        const highlight = count === 0 ? ' style="background-color: #fffde7;"' : '';
+        
+        html += `<tr${highlight}>
+          <td>${pair}</td>
+          <td>${pairType}</td>
+          <td>${count}回</td>
+          <td>${levelSum}</td>
+        </tr>`;
+      });
+      
+      // 未対戦ペアの数を表示
+      const unpairedCount = sortedPairs.filter(pair => (pairingCounts[pair] || 0) === 0).length;
+      html += `<tr><td colspan="4" style="text-align: center; font-weight: bold; background-color: ${unpairedCount > 0 ? '#fff8e1' : '#e8f5e9'}">
+        未対戦ペア: ${unpairedCount}組 / 全${sortedPairs.length}組
+      </td></tr>`;
+      
+      html += "</table></div>";
+      
+      return html;
+    }
+
+    function generateRounds(pairingType = 'any', outputElementId = 'output') {
+      currentPairingType = pairingType;
+      const names = document.getElementById("playerNames").value.trim().split("\n");
+      const levelInput = document.getElementById("playerLevels").value.trim().split("\n");
+      const genderInput = document.getElementById("playerGenders").value.trim().split("\n");
+      const courtCount = parseInt(document.getElementById("courtCount").value);
+      const totalRounds = parseInt(document.getElementById("totalRounds").value);
+      const output = document.getElementById(outputElementId);
+      if (output) output.innerHTML = "";
+
+      collectRestSettings();
+
+      const players = [];
+      const allPlayers = [];
+      let maleCount = 0;
+      let femaleCount = 0;
+
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i].trim();
+        let level = parseInt(levelInput[i]) || Math.floor(Math.random() * 5) + 1;
+        let gender = (genderInput[i] || 'male').trim();
+        if (name) {
+          players.push([name, level]);
+          allPlayers.push({ name, level, gender });
+          if (gender === 'male') maleCount++;
+          else femaleCount++;
+        }
+      }
+
+      initializePairingCounts(allPlayers);
+      playCountMap = {};
+      players.forEach(p => playCountMap[p[0]] = 0);
+
+      let fullHtml = `
+        <div class="player-count-info">
+          登録プレイヤー: 男性 ${maleCount}人, 女性 ${femaleCount}人, 合計 ${players.length}人
+        </div>
+      `;
+      
+      let currentRoundPairs = [];
+      allRoundData = [];
+      allPreviousPairs = [];
+
+      for (let roundNumber = 1; roundNumber <= totalRounds; roundNumber++) {
+        let availablePlayers = [...players];
+        const restingPlayers = getRestingPlayers(roundNumber);
+        availablePlayers = availablePlayers.filter(player => !restingPlayers.includes(player[0]));
+
+        // 出場回数が少ないプレイヤーを優先
+        availablePlayers.sort((a, b) => playCountMap[a[0]] - playCountMap[b[0]]);
+        
+        const malePlayers = availablePlayers.filter(p => {
+          const player = allPlayers.find(ap => ap.name === p[0]);
+          return player && player.gender === 'male';
+        });
+        
+        const femalePlayers = availablePlayers.filter(p => {
+          const player = allPlayers.find(ap => ap.name === p[0]);
+          return player && player.gender === 'female';
+        });
+
+        let selectedPlayers = [];
+        let warningMessage = "";
+        
+        if (pairingType === 'men') {
+          const maxPossiblePairs = Math.min(Math.floor(malePlayers.length / 2), courtCount);
+          selectedPlayers = malePlayers.slice(0, maxPossiblePairs * 2);
+          
+          if (malePlayers.length < 4) {
+            warningMessage = `<p class="warning-message">⚠️ 男子プレイヤーが不足しています (${malePlayers.length}人)。男子ダブルスを組むには最低4人必要です。</p>`;
+          }
+        } else if (pairingType === 'women') {
+          const maxPossiblePairs = Math.min(Math.floor(femalePlayers.length / 2), courtCount);
+          selectedPlayers = femalePlayers.slice(0, maxPossiblePairs * 2);
+          
+          if (femalePlayers.length < 4) {
+            warningMessage = `<p class="warning-message">⚠️ 女子プレイヤーが不足しています (${femalePlayers.length}人)。女子ダブルスを組むには最低4人必要です。</p>`;
+          }
+        } else if (pairingType === 'mix') {
+          const maxPossiblePairs = Math.min(Math.min(malePlayers.length, femalePlayers.length), courtCount);
+          for (let i = 0; i < maxPossiblePairs; i++) {
+            if (malePlayers[i] && femalePlayers[i]) {
+              selectedPlayers.push(malePlayers[i]);
+              selectedPlayers.push(femalePlayers[i]);
+            }
+          }
+          
+          if (malePlayers.length < 2 || femalePlayers.length < 2) {
+            warningMessage = `<p class="warning-message">⚠️ ミックスダブルスを組むには男性と女性が各2人以上必要です (男性: ${malePlayers.length}人, 女性: ${femalePlayers.length}人)。</p>`;
+          }
+        } else {
+          const maxPossiblePlayers = Math.min(availablePlayers.length, courtCount * 4);
+          selectedPlayers = availablePlayers.slice(0, maxPossiblePlayers);
+          
+          if (availablePlayers.length < 4) {
+            warningMessage = `<p class="warning-message">⚠️ プレイヤーが不足しています (${availablePlayers.length}人)。ダブルスを組むには最低4人必要です。</p>`;
+          }
+        }
+
+        let html = `<h3>第 ${roundNumber} ラウンド (${getPairingTypeName(pairingType)})</h3>`;
+        
+        if (warningMessage) {
+          html += warningMessage;
+        }
+        
+        if (restingPlayers.length > 0) {
+          html += `<p>休憩中のプレイヤー: ${restingPlayers.join(', ')}</p>`;
+        }
+        
+        html += "<table><tr><th>コート</th><th>チーム A</th><th>チーム B</th><th>A-B 差</th><th>タイプ</th></tr>";
+
+        currentRoundPairs = [];
+        const roundData = {
+          roundNumber: roundNumber,
+          courts: []
+        };
+        
+        let assignedPlayers = new Set();
+        let courtNumber = 1;
+        let remainingPlayersList = [];
+        
+        while (courtNumber <= courtCount) {
+          const availableForCourt = selectedPlayers.filter(p => !assignedPlayers.has(p[0]));
+          
+          if (availableForCourt.length >= 4) {
+            const [a, b, diff, pair1Type, pair2Type] = createPairs(availableForCourt, allPlayers, pairingType);
+            
+            if (a && b && a.length > 0 && b.length > 0) {
+              const pair1 = [a[0][0], a[1][0]].sort();
+              const pair2 = [b[0][0], b[1][0]].sort();
+              const pair1Key = pair1.join(' & ');
+              const pair2Key = pair2.join(' & ');
+              currentRoundPairs.push(pair1Key, pair2Key);
+              
+              pairingCounts[pair1Key] = (pairingCounts[pair1Key] || 0) + 1;
+              pairingCounts[pair2Key] = (pairingCounts[pair2Key] || 0) + 1;
+              a.forEach(player => playCountMap[player[0]]++);
+              b.forEach(player => playCountMap[player[0]]++);
+              
+              const pairingTypeText = pair1Type === pair2Type ? 
+                (pair1Type === 'men' ? '男子ダブルス' : 
+                 pair1Type === 'women' ? '女子ダブルス' : 'ミックスダブルス') : '混合';
+              
+              html += createMatchRow(courtNumber, a, b, diff, pair1Type, pair2Type, pairingTypeText);
+              
+              assignedPlayers.add(a[0][0]);
+              assignedPlayers.add(a[1][0]);
+              assignedPlayers.add(b[0][0]);
+              assignedPlayers.add(b[1][0]);
+              
+              roundData.courts.push({
+                courtNumber: courtNumber,
+                members: [...a, ...b].map(p => p[0]),
+                isFreePractice: false
+              });
+              
+              courtNumber++;
+              continue;
+            }
+          }
+          
+          const remainingPlayers = availableForCourt.map(p => p[0]);
+          if (remainingPlayers.length > 0) {
+            remainingPlayersList.push(...remainingPlayers);
+            html += `<tr>
+              <td>コート ${courtNumber}</td>
+              <td colspan="3">自由練習 <span class="remaining-players">(余り: ${remainingPlayers.join(', ')})</span></td>
+              <td>なし</td>
+            </tr>`;
+          } else {
+            html += `<tr><td>コート ${courtNumber}</td><td colspan="3">自由練習</td><td>なし</td></tr>`;
+          }
+          
+          roundData.courts.push({
+            courtNumber: courtNumber,
+            members: remainingPlayers,
+            isFreePractice: true
+          });
+          
+          courtNumber++;
+        }
+
+        if (remainingPlayersList.length > 0) {
+          html += `<p class="remaining-players">未割り当てプレイヤー: ${[...new Set(remainingPlayersList)].join(', ')}</p>`;
+        }
+
+        html += "</table>";
+        fullHtml += html;
+        allPreviousPairs = [...allPreviousPairs, ...currentRoundPairs];
+        allRoundData.push(roundData);
+      }
+
+      fullHtml += createStatistics(playCountMap, pairingCounts, allPlayers, currentPairingType);
+      if (output) output.innerHTML = fullHtml;
+      initializeCourtDynamics();
+      
+      // 共有用データを保存
+      currentShareData = {
+        court: courtCount,
+        rounds: totalRounds,
+        names: names.join('\n'),
+        levels: levelInput.join('\n'),
+        genders: genderInput.join('\n'),
+        restSettings: restSettings,
+        eventInfo: {
+          name: document.getElementById("eventName").value.trim(),
+          location: document.getElementById("eventLocation").value.trim(),
+          date: document.getElementById("eventDate").value,
+          time: document.getElementById("eventTime").value
+        },
+        registeredPlayers: registeredPlayers
+      };
+      
+      return fullHtml;
+    }
+
+    function getPairingTypeName(type) {
+      switch(type) {
+        case 'any': return 'ランダム';
+        case 'mix': return 'ミックスダブルス';
+        case 'men': return '男子ダブルス';
+        case 'women': return '女子ダブルス';
+        default: return '';
+      }
+    }
+
+    function addRestControl() {
+      const container = document.getElementById('restContainer');
+      const restId = Date.now();
+      
+      const restItem = document.createElement('div');
+      restItem.className = 'rest-item';
+      restItem.id = `restItem-${restId}`;
+      
+      const playerSelect = document.createElement('select');
+      playerSelect.id = `restPlayer-${restId}`;
+      playerSelect.multiple = true;
+      playerSelect.style.height = 'auto';
+      
+      const roundInput = document.createElement('input');
+      roundInput.type = 'number';
+      roundInput.id = `restRound-${restId}`;
+      roundInput.min = '1';
+      roundInput.placeholder = '休憩ラウンド';
+      
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '削除';
+      removeBtn.onclick = function() {
+        container.removeChild(restItem);
+        restSettings = restSettings.filter(item => item.id !== restId);
+      };
+      
+      restItem.appendChild(playerSelect);
+      restItem.appendChild(roundInput);
+      restItem.appendChild(removeBtn);
+      
+      container.appendChild(restItem);
+      
+      updatePlayerSelects();
+      
+      return restId;
+    }
+
+    function updatePlayerSelects() {
+      const names = document.getElementById("playerNames").value.trim().split("\n");
+      
+      const allPlayers = names.filter(name => name.trim() !== '');
+      
+      const selects = document.querySelectorAll('select[id^="restPlayer-"]');
+      selects.forEach(select => {
+        const selectedValues = Array.from(select.selectedOptions).map(option => option.value);
+        
+        select.innerHTML = '';
+        allPlayers.forEach(player => {
+          const option = document.createElement('option');
+          option.value = player.trim();
+          option.textContent = player.trim();
+          select.appendChild(option);
+        });
+        
+        selectedValues.forEach(value => {
+          const option = Array.from(select.options).find(opt => opt.value === value);
+          if (option) option.selected = true;
+        });
+      });
+    }
+
+    function initializeCourtDynamics() {
+      const courtCount = parseInt(document.getElementById("courtCount").value) || 1;
+      const totalRounds = parseInt(document.getElementById("totalRounds").value) || 1;
+      
+      courtRoundSettings = {};
+      for (let i = 1; i <= courtCount; i++) {
+        courtRoundSettings[i] = 1;
+      }
+    }
+
+    function showCourtDynamicsPopup() {
+      const popup = document.getElementById('courtDynamicsPopup');
+      popup.style.display = 'flex';
+      updateCourtDynamics();
+    }
+
+    function closeCourtDynamicsPopup() {
+      document.getElementById('courtDynamicsPopup').style.display = 'none';
+    }
+
+    function updateCourtDynamics() {
+      const courtCount = parseInt(document.getElementById("courtCount").value) || 1;
+      const dynamicsOutput = document.getElementById('dynamicsOutput');
+      
+      let html = '<div class="court-members">';
+      
+      for (let courtNumber = 1; courtNumber <= courtCount; courtNumber++) {
+        const roundNumber = courtRoundSettings[courtNumber] || 1;
+        
+        const roundData = allRoundData.find(round => round.roundNumber === roundNumber);
+        const courtData = roundData?.courts.find(court => court.courtNumber === courtNumber);
+        
+        html += '<div class="court-box">';
+        html += `<div class="court-title">
+          <span>コート ${courtNumber}</span>
+          <div class="court-round-control">
+            <button onclick="changeCourtRound(${courtNumber}, -1)">◀</button>
+            <input type="number" id="courtRoundInput-${courtNumber}" 
+                   value="${roundNumber}" min="1" 
+                   onchange="setCourtRound(${courtNumber}, this.value)">
+            <button onclick="changeCourtRound(${courtNumber}, 1)">▶</button>
+          </div>
+        </div>`;
+        
+        if (!courtData || courtData.isFreePractice) {
+          const remaining = courtData?.members?.length > 0 ? 
+            `<span class="free-practice">(余り: ${courtData.members.join(', ')})</span>` : '';
+          html += '<ul class="member-list"><li class="free-practice">自由練習 ' + remaining + '</li></ul>';
+        } else {
+          html += '<ul class="member-list">';
+          courtData.members.forEach(member => {
+            html += `<li>${member}</li>`;
+          });
+          html += '</ul>';
+        }
+        
+        html += '</div>';
+      }
+      
+      html += '</div>';
+      dynamicsOutput.innerHTML = html;
+    }
+
+    function changeCourtRound(courtNumber, delta) {
+      const currentRound = courtRoundSettings[courtNumber] || 1;
+      const totalRounds = parseInt(document.getElementById("totalRounds").value) || 1;
+      const newRound = Math.max(1, Math.min(totalRounds, currentRound + delta));
+      
+      courtRoundSettings[courtNumber] = newRound;
+      document.getElementById(`courtRoundInput-${courtNumber}`).value = newRound;
+      updateCourtDynamics();
+    }
+
+    function setCourtRound(courtNumber, round) {
+      const totalRounds = parseInt(document.getElementById("totalRounds").value) || 1;
+      const newRound = Math.max(1, Math.min(totalRounds, parseInt(round) || 1));
+      
+      courtRoundSettings[courtNumber] = newRound;
+      updateCourtDynamics();
+    }
+
+    function collectRestSettings() {
+      restSettings = [];
+      const restItems = document.querySelectorAll('.rest-item');
+      
+      restItems.forEach(item => {
+        const id = item.id.replace('restItem-', '');
+        const playerSelect = document.getElementById(`restPlayer-${id}`);
+        const roundInput = document.getElementById(`restRound-${id}`);
+        
+        if (playerSelect && roundInput && roundInput.value) {
+          const players = Array.from(playerSelect.selectedOptions).map(option => option.value);
+          const round = parseInt(roundInput.value);
+          
+          if (players.length > 0 && !isNaN(round)) {
+            restSettings.push({
+              id: id,
+              players: players,
+              round: round
+            });
+          }
+        }
+      });
+    }
+
+    function getRestingPlayers(roundNumber) {
+      const restingPlayers = [];
+      restSettings.forEach(setting => {
+        if (setting.round === roundNumber) {
+          restingPlayers.push(...setting.players);
+        }
+      });
+      return [...new Set(restingPlayers)];
+    }
+
+    function generateShareLink() {
+      try {
+        const courtCount = document.getElementById("courtCount").value;
+        const totalRounds = document.getElementById("totalRounds").value;
+        const playerNames = document.getElementById("playerNames").value.trim();
+        const playerLevels = document.getElementById("playerLevels").value.trim();
+        const playerGenders = document.getElementById("playerGenders").value.trim();
+
+        // イベント情報を取得
+        const eventName = document.getElementById("eventName").value.trim();
+        const eventLocation = document.getElementById("eventLocation").value.trim();
+        const eventDate = document.getElementById("eventDate").value;
+        const eventTime = document.getElementById("eventTime").value;
+
+        collectRestSettings();
+        
+        const data = {
+          court: courtCount,
+          rounds: totalRounds,
+          names: playerNames,
+          levels: playerLevels,
+          genders: playerGenders,
+          restSettings: restSettings,
+          // イベント情報を追加
+          eventInfo: {
+            name: eventName,
+            location: eventLocation,
+            date: eventDate,
+            time: eventTime
+          },
+          registeredPlayers: registeredPlayers
+        };
+        
+        const encodedData = encodeURIComponent(JSON.stringify(data));
+        const shareURL = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
+        
+        document.getElementById("shareLink").value = shareURL;
+        return true;
+      } catch (error) {
+        console.error("シェアリンク生成エラー:", error);
+        alert("シェアリンクの生成に失敗しました");
+        return false;
+      }
+    }
+
+    function copyShareLink() {
+      const linkInput = document.getElementById("shareLink");
+      linkInput.select();
+      linkInput.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("リンクをコピーしました！");
+    }
+
+    function loadRestSettings(settings) {
+      const container = document.getElementById('restContainer');
+      container.innerHTML = '';
+      
+      settings.forEach(setting => {
+        const restId = addRestControl();
+        
+        const playerSelect = document.getElementById(`restPlayer-${restId}`);
+        const roundInput = document.getElementById(`restRound-${restId}`);
+        
+        if (playerSelect && roundInput) {
+          setting.players.forEach(player => {
+            const option = Array.from(playerSelect.options).find(opt => opt.value === player);
+            if (option) option.selected = true;
+          });
+          
+          roundInput.value = setting.round;
+        }
+      });
+    }
+
+    function saveData() {
+      const data = {
+        eventName: document.getElementById("eventName").value,
+        eventLocation: document.getElementById("eventLocation").value,
+        eventDate: document.getElementById("eventDate").value,
+        eventTime: document.getElementById("eventTime").value,
+        registeredPlayers: registeredPlayers,
+        teamDivisionData: {
+          courtCount: document.getElementById("courtCount").value,
+          totalRounds: document.getElementById("totalRounds").value,
+          playerNames: document.getElementById("playerNames").value,
+          playerLevels: document.getElementById("playerLevels").value,
+          playerGenders: document.getElementById("playerGenders").value,
+          restSettings: restSettings
+        }
+      };
+      
+      localStorage.setItem('badmintonTeamToolData', JSON.stringify(data));
+      alert('データを保存しました');
+    }
+
+    function loadData() {
+      const savedData = localStorage.getItem('badmintonTeamToolData');
+      if (!savedData) {
+        alert('保存されたデータが見つかりません');
+        return;
+      }
+      
+      try {
+        const data = JSON.parse(savedData);
+        
+        document.getElementById("eventName").value = data.eventName || "";
+        document.getElementById("eventLocation").value = data.eventLocation || "";
+        document.getElementById("eventDate").value = data.eventDate || "";
+        document.getElementById("eventTime").value = data.eventTime || "";
+        
+        if (data.registeredPlayers) {
+          registeredPlayers = data.registeredPlayers;
+          updateRegisteredPlayersList();
+        }
+        
+        if (data.teamDivisionData) {
+          const td = data.teamDivisionData;
+          document.getElementById("courtCount").value = td.courtCount || "";
+          document.getElementById("totalRounds").value = td.totalRounds || "";
+          document.getElementById("playerNames").value = td.playerNames || "";
+          document.getElementById("playerLevels").value = td.playerLevels || "";
+          document.getElementById("playerGenders").value = td.playerGenders || "";
+          
+          if (td.restSettings) {
+            loadRestSettings(td.restSettings);
+          }
+        }
+        
+        alert('データを読み込みました');
+      } catch (error) {
+        console.error('データ読み込みエラー:', error);
+        alert('データの読み込みに失敗しました');
+      }
+    }
+
+    function exportData() {
+      const data = {
+        eventName: document.getElementById("eventName").value,
+        eventLocation: document.getElementById("eventLocation").value,
+        eventDate: document.getElementById("eventDate").value,
+        eventTime: document.getElementById("eventTime").value,
+        registeredPlayers: registeredPlayers,
+        teamDivisionData: {
+          courtCount: document.getElementById("courtCount").value,
+          totalRounds: document.getElementById("totalRounds").value,
+          playerNames: document.getElementById("playerNames").value,
+          playerLevels: document.getElementById("playerLevels").value,
+          playerGenders: document.getElementById("playerGenders").value,
+          restSettings: restSettings
+        }
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'badminton-team-data.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          
+          document.getElementById("eventName").value = data.eventName || "";
+          document.getElementById("eventLocation").value = data.eventLocation || "";
+          document.getElementById("eventDate").value = data.eventDate || "";
+          document.getElementById("eventTime").value = data.eventTime || "";
+          
+          if (data.registeredPlayers) {
+            registeredPlayers = data.registeredPlayers;
+            updateRegisteredPlayersList();
+          }
+          
+          if (data.teamDivisionData) {
+            const td = data.teamDivisionData;
+            document.getElementById("courtCount").value = td.courtCount || "";
+            document.getElementById("totalRounds").value = td.totalRounds || "";
+            document.getElementById("playerNames").value = td.playerNames || "";
+            document.getElementById("playerLevels").value = td.playerLevels || "";
+            document.getElementById("playerGenders").value = td.playerGenders || "";
+            
+            if (td.restSettings) {
+              loadRestSettings(td.restSettings);
+            }
+          }
+          
+          alert('データをインポートしました');
+        } catch (error) {
+          console.error('インポートエラー:', error);
+          alert('ファイルの読み込みに失敗しました');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+   function exportToExcel() {
+  try {
+    // 检查数据是否存在
+    if (!currentShareData || !allRoundData || allRoundData.length === 0) {
+      alert("请先生成团队分配数据");
+      return;
+    }
+
+    // 1. 准备数据
+    let csvContent = "データ,内容\n";
+    
+    // イベント情報
+    if (currentShareData.eventInfo) {
+      const ei = currentShareData.eventInfo;
+      csvContent += `イベント名,${ei.name || ''}\n`;
+      csvContent += `場所,${ei.location || ''}\n`;
+      csvContent += `日付,${ei.date || ''}\n`;
+      csvContent += `時間,${ei.time || ''}\n\n`;
+    }
+
+    // プレイヤーリスト
+    csvContent += "プレイヤーリスト\n名前,レベル,性別\n";
+    const names = currentShareData.names.split('\n');
+    const levels = currentShareData.levels.split('\n');
+    const genders = currentShareData.genders.split('\n');
+
+    for (let i = 0; i < names.length; i++) {
+      const name = names[i].trim();
+      if (name) {
+        const level = levels[i] || '3';
+        const gender = genders[i] === 'male' ? '男性' : genders[i] === 'female' ? '女性' : genders[i] || '男性';
+        csvContent += `${name},${level},${gender}\n`;
+      }
+    }
+    csvContent += "\n";
+
+    // ラウンド情報
+    allRoundData.forEach(round => {
+      csvContent += `第 ${round.roundNumber} ラウンド\n`;
+      csvContent += "コート,チームA,チームB,A-B差,タイプ\n";
+
+      const restingPlayers = getRestingPlayers(round.roundNumber);
+      if (restingPlayers.length > 0) {
+        csvContent += `休憩中のプレイヤー,${restingPlayers.join(', ')},,,\n`;
+      }
+
+      round.courts.forEach(court => {
+        if (court.isFreePractice) {
+          const members = court.members.length > 0 ? ` (${court.members.join(', ')})` : '';
+          csvContent += `コート ${court.courtNumber},自由練習${members},,,\n`;
+        } else {
+          const teamA = court.members.slice(0, 2).join(" & ");
+          const teamB = court.members.slice(2, 4).join(" & ");
+          
+          // 计算等级差
+          const allPlayers = names.map((name, i) => ({
+            name: name.trim(),
+            level: parseInt(levels[i]) || 3
+          })).filter(p => p.name);
+          
+          const teamALevel = court.members.slice(0, 2).reduce((sum, name) => {
+            const player = allPlayers.find(p => p.name === name);
+            return sum + (player ? player.level : 0);
+          }, 0);
+          
+          const teamBLevel = court.members.slice(2, 4).reduce((sum, name) => {
+            const player = allPlayers.find(p => p.name === name);
+            return sum + (player ? player.level : 0);
+          }, 0);
+          
+          const levelDiff = teamALevel - teamBLevel;
+          
+          // 获取配对类型
+          const player1 = allPlayers.find(p => p.name === court.members[0]);
+          const player2 = allPlayers.find(p => p.name === court.members[1]);
+          const player3 = allPlayers.find(p => p.name === court.members[2]);
+          const player4 = allPlayers.find(p => p.name === court.members[3]);
+          
+          let pairType = '';
+          if (player1 && player2 && player3 && player4) {
+            const type1 = player1.gender === 'male' && player2.gender === 'male' ? '男子' : 
+                         player1.gender === 'female' && player2.gender === 'female' ? '女子' : 'ミックス';
+            const type2 = player3.gender === 'male' && player4.gender === 'male' ? '男子' : 
+                         player3.gender === 'female' && player4.gender === 'female' ? '女子' : 'ミックス';
+            pairType = type1 === type2 ? 
+                      (type1 === '男子' ? '男子ダブルス' : 
+                       type1 === '女子' ? '女子ダブルス' : 'ミックスダブルス') : '混合';
+          }
+          
+          csvContent += `コート ${court.courtNumber},${teamA},${teamB},${levelDiff},${pairType}\n`;
+        }
+      });
+      csvContent += "\n";
+    });
+
+    // 2. 创建下载链接
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    const eventName = currentShareData.eventInfo?.name || 'badminton';
+    link.download = `${eventName.replace(/[^a-z0-9]/gi, '_')}_チーム分け.csv`;
+    
+    // 3. 触发下载
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+  } catch (error) {
+    console.error("导出Excel时出错:", error);
+    alert(`导出失败: ${error.message}`);
+  }
+}
+
+
+    function openInNewWindow(pairingType) {
+      const newWindow = window.open('', '_blank');
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>バドミントンチーム分け結果 - ${getPairingTypeName(pairingType)}</title>
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              padding: 20px;
+              background: #f4f4f4;
+              color: #000;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              margin-top: 20px;
+              background-color: white;
+              border-radius: 10px;
+              overflow: hidden;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 12px;
+              text-align: center;
+              font-size: 16px;
+            }
+            th {
+              background-color: #4CAF50;
+              color: white;
+            }
+            .bold-text {
+              font-weight: bold;
+              color: black;
+            }
+            .pairing-type {
+              display: inline-block;
+              padding: 2px 6px;
+              border-radius: 4px;
+              font-size: 12px;
+              margin-left: 5px;
+            }
+            .pairing-type.men {
+              background-color: #2196F3;
+              color: white;
+            }
+            .pairing-type.women {
+              background-color: #E91E63;
+              color: white;
+            }
+            .pairing-type.mix {
+              background-color: #4CAF50;
+              color: white;
+            }
+            .pairing-stats {
+              margin-top: 20px;
+              background-color: white;
+              padding: 20px;
+              border-radius: 10px;
+            }
+            .warning-message {
+              color: #d32f2f;
+              font-weight: bold;
+              margin: 10px 0;
+            }
+            .player-count-info {
+              background-color: #e3f2fd;
+              padding: 10px;
+              border-radius: 5px;
+              margin-bottom: 15px;
+              font-weight: bold;
+            }
+            .remaining-players {
+              color: #616161;
+              font-style: italic;
+              margin-top: 5px;
+            }
+            .level-diff-warning {
+              color: #FF9800;
+              font-weight: bold;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>バドミントンチーム分け結果 - ${getPairingTypeName(pairingType)}</h1>
+          <div id="output"></div>
+          <button onclick="window.print()" style="margin-top: 20px; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">印刷</button>
+        </body>
+        </html>
+      `;
+      
+      newWindow.document.open();
+      newWindow.document.write(html);
+      newWindow.document.close();
+      
+      setTimeout(() => {
+        const names = document.getElementById("playerNames").value.trim().split("\n");
+        const levelInput = document.getElementById("playerLevels").value.trim().split("\n");
+        const genderInput = document.getElementById("playerGenders").value.trim().split("\n");
+        const courtCount = parseInt(document.getElementById("courtCount").value);
+        const totalRounds = parseInt(document.getElementById("totalRounds").value);
+        
+        const players = [];
+        const allPlayers = [];
+        
+        for (let i = 0; i < names.length; i++) {
+          const name = names[i].trim();
+          let level = parseInt(levelInput[i]) || Math.floor(Math.random() * 5) + 1;
+          let gender = (genderInput[i] || 'male').trim();
+          if (name) {
+            players.push([name, level]);
+            allPlayers.push({ name, level, gender });
+          }
+        }
+        
+        const output = newWindow.document.getElementById("output");
+        const result = generateRounds.call({
+          document: newWindow.document,
+          getElementById: (id) => newWindow.document.getElementById(id),
+        }, pairingType, "output");
+        
+        output.innerHTML = result;
+      }, 500);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      
+      if (params.has("data")) {
+        try {
+          const data = JSON.parse(decodeURIComponent(params.get("data")));
+          
+          document.getElementById("courtCount").value = data.court || 1;
+          document.getElementById("totalRounds").value = data.rounds || 1;
+          document.getElementById("playerNames").value = data.names || "";
+          document.getElementById("playerLevels").value = data.levels || "";
+          document.getElementById("playerGenders").value = data.genders || "";
+
+          // イベント情報を復元
+          if (data.eventInfo) {
+            document.getElementById("eventName").value = data.eventInfo.name || "";
+            document.getElementById("eventLocation").value = data.eventInfo.location || "";
+            document.getElementById("eventDate").value = data.eventInfo.date || "";
+            document.getElementById("eventTime").value = data.eventInfo.time || "";
+          }
+
+          if (data.registeredPlayers) {
+            registeredPlayers = data.registeredPlayers;
+            updateRegisteredPlayersList();
+          }
+
+          if (data.restSettings) {
+            loadRestSettings(data.restSettings);
+          }
+
+          document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+          });
+          document.getElementById('teamTab').classList.add('active');
+          
+          document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+          });
+          document.querySelector('.tab-container button:nth-child(2)').classList.add('active');
+          
+          generateRounds('any');
+        } catch (e) {
+          console.error("データ読み込みエラー:", e);
+          alert("共有データの読み込みに失敗しました");
+        }
+      }
+      
+      document.getElementById("playerNames").addEventListener("input", updatePlayerSelects);
+      
+      loadData();
+    });
+  </script>
+</body>
+</html>
