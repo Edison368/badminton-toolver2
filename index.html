@@ -1508,46 +1508,49 @@
     }
 
     function generateShareLink() {
-      try {
-        const courtCount = document.getElementById("courtCount").value;
-        const totalRounds = document.getElementById("totalRounds").value;
-        const playerNames = document.getElementById("playerNames").value.trim();
-        const playerLevels = document.getElementById("playerLevels").value.trim();
-        const playerGenders = document.getElementById("playerGenders").value.trim();
+  try {
+    const courtCount = document.getElementById("courtCount").value;
+    const totalRounds = document.getElementById("totalRounds").value;
+    const playerNames = document.getElementById("playerNames").value.trim();
+    const playerLevels = document.getElementById("playerLevels").value.trim();
+    const playerGenders = document.getElementById("playerGenders").value.trim();
 
-        const eventName = document.getElementById("eventName").value.trim();
-        const eventLocation = document.getElementById("eventLocation").value.trim();
-        const eventDate = document.getElementById("eventDate").value;
-        const eventTime = document.getElementById("eventTime").value;
+    // イベント情報を取得
+    const eventName = document.getElementById("eventName").value.trim();
+    const eventLocation = document.getElementById("eventLocation").value.trim();
+    const eventDate = document.getElementById("eventDate").value;
+    const eventTime = document.getElementById("eventTime").value;
 
-        collectRestSettings();
-        
-        const data = {
-          court: courtCount,
-          rounds: totalRounds,
-          names: playerNames,
-          levels: playerLevels,
-          genders: playerGenders,
-          restSettings: restSettings,
-          eventName: eventName,
-          eventLocation: eventLocation,
-          eventDate: eventDate,
-          eventTime: eventTime,
-          registeredPlayers: registeredPlayers
-        };
-        
-        const encodedData = encodeURIComponent(JSON.stringify(data));
-        const shareURL = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
-        
-        document.getElementById("shareLink").value = shareURL;
-        return true;
-      } catch (error) {
-        console.error("シェアリンク生成エラー:", error);
-        alert("シェアリンクの生成に失敗しました");
-        return false;
-      }
-    }
-
+    collectRestSettings();
+    
+    const data = {
+      court: courtCount,
+      rounds: totalRounds,
+      names: playerNames,
+      levels: playerLevels,
+      genders: playerGenders,
+      restSettings: restSettings,
+      // イベント情報を追加
+      eventInfo: {
+        name: eventName,
+        location: eventLocation,
+        date: eventDate,
+        time: eventTime
+      },
+      registeredPlayers: registeredPlayers
+    };
+    
+    const encodedData = encodeURIComponent(JSON.stringify(data));
+    const shareURL = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
+    
+    document.getElementById("shareLink").value = shareURL;
+    return true;
+  } catch (error) {
+    console.error("シェアリンク生成エラー:", error);
+    alert("シェアリンクの生成に失敗しました");
+    return false;
+  }
+}
     function copyShareLink() {
       const linkInput = document.getElementById("shareLink");
       linkInput.select();
