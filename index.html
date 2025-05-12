@@ -493,6 +493,48 @@
     .unpaired-highlight {
       background-color: #fffde7;
     }
+    
+    /* 固定ペア用スタイル */
+    .fixed-pair-controls {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #dee2e6;
+    }
+    
+    .fixed-pair-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .fixed-pair-item select, .fixed-pair-item input {
+      flex: 1;
+    }
+    
+    .fixed-pair-item button {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      background-color: #dc3545;
+    }
+    
+    .fixed-pair-item button:hover {
+      background-color: #c82333;
+    }
+    
+    #addFixedPairBtn {
+      background-color: #FF9800;
+    }
+    
+    #addFixedPairBtn:hover {
+      background-color: #F57C00;
+    }
+    
+    .fixed-pair-highlight {
+      background-color: #e8f5e9;
+    }
   </style>
 </head>
 <body>
@@ -545,7 +587,7 @@
           <span id="levelDisplay" class="level-value">3</span>
         </div>
         <div class="level-marks">
-          <span class="level-mark">初心者</span>
+          <span class="level-mark">初級</span>
           <span class="level-mark">中級</span>
           <span class="level-mark">上級</span>
         </div>
@@ -606,9 +648,17 @@
         </div>
         <button id="addRestBtn" onclick="addRestControl()">＋ 休憩設定を追加</button>
       </div>
+      
+      <div class="fixed-pair-controls">
+        <h3>固定ペア設定</h3>
+        <div id="fixedPairContainer">
+          <!-- 固定ペア設定項目がここに追加されます -->
+        </div>
+        <button id="addFixedPairBtn" onclick="addFixedPairControl()">＋ 固定ペアを追加</button>
+      </div>
 
       <div class="generation-buttons">
-        <button id="generateAny" onclick="generateRounds('any')">即生成</button>
+        <button id="generateAny" onclick="generateRounds('any')">らくらく生成</button>
         <button id="generateMix" onclick="generateRounds('mix')">ミックス生成</button>
         <button id="generateMen" onclick="generateRounds('men')">男子ダブルス生成</button>
         <button id="generateWomen" onclick="generateRounds('women')">女子ダブルス生成</button>
@@ -621,7 +671,7 @@
       <input type="text" id="shareLink" readonly />
 
       <!-- 新しいウィンドウで開くボタン -->
-      <button class="new-window-btn" onclick="openInNewWindow('any')">🖥️ 即生成 (新規ウィンドウ)</button>
+      <button class="new-window-btn" onclick="openInNewWindow('any')">🖥️ らくらく生成 (新規ウィンドウ)</button>
       <button class="new-window-btn" onclick="openInNewWindow('mix')">🖥️ ミックスダブルス (新規ウィンドウ)</button>
       <button class="new-window-btn" onclick="openInNewWindow('men')">🖥️ 男子ダブルス (新規ウィンドウ)</button>
       <button class="new-window-btn" onclick="openInNewWindow('women')">🖥️ 女子ダブルス (新規ウィンドウ)</button>
@@ -654,6 +704,7 @@
     let allPreviousPairs = [];
     let pairingCounts = {};
     let restSettings = [];
+    let fixedPairs = []; // 固定ペア設定を保持する配列
     let allRoundData = [];
     let courtRoundSettings = {};
     let registeredPlayers = [];
@@ -766,6 +817,9 @@
       namesTextarea.value = names;
       levelsTextarea.value = levels;
       gendersTextarea.value = genders;
+      
+      // プレイヤー選択リストを更新
+      updatePlayerSelects();
     }
 
     function goToTeamDivision() {
@@ -822,168 +876,301 @@
       return 'mix';
     }
 
-   function createPairs(players, allPlayers, pairingType) {
-  // レベル差を計算する関数
-  const calculateLevelDiff = (pair1, pair2) => {
-    const pair1Level = pair1[0][1] + pair1[1][1];
-    const pair2Level = pair2[0][1] + pair2[1][1];
-    return Math.abs(pair1Level - pair2Level);
-  };
-
-  // スコア計算関数（未対戦優先 + レベル差最小化）
-  const calculatePairScore = (pair1, pair2) => {
-    const pair1Key = [pair1[0][0], pair1[1][0]].sort().join(' & ');
-    const pair2Key = [pair2[0][0], pair2[1][0]].sort().join(' & ');
+    function createPairs(players, allPlayers, pairingType, roundNumber) {
+  // このラウンドの固定ペアを取得
+  const roundFixedPairs = fixedPairs.filter(fp => fp.round === roundNumber);
+  
+  // 固定ペアがある場合、それらを優先的に処理
+  if (roundFixedPairs.length > 0) {
+    const fixedPairPlayers = [];
+    const fixedPairData = [];
     
-    // 未対戦ペア優先（重み: 10）
-    const unpairScore = 
-      ((pairingCounts[pair1Key] || 0) === 0 ? 0 : 10) +
-      ((pairingCounts[pair2Key] || 0) === 0 ? 0 : 10);
-    
-    // レベル差最小化（重み: 1）※係数調整可能
-    const levelDiff = calculateLevelDiff(pair1, pair2) * 1;
-    
-    return unpairScore + levelDiff;
-  };
-
-  // 最適なペアを選択
-  const selectOptimalPairs = (candidatePairs) => {
-    let bestScore = Infinity;
-    let bestPairs = null;
-
-    // 全候補ペアを評価
-    for (let i = 0; i < candidatePairs.length; i++) {
-      for (let j = i + 1; j < candidatePairs.length; j++) {
-        const pair1 = candidatePairs[i];
-        const pair2 = candidatePairs[j];
-        
-        // 重複プレイヤーチェック
-        if (
-          pair1[0][0] === pair2[0][0] || pair1[0][0] === pair2[1][0] ||
-          pair1[1][0] === pair2[0][0] || pair1[1][0] === pair2[1][0]
-        ) continue;
-
-        // スコア計算
-        const currentScore = calculatePairScore(pair1, pair2);
-        
-        // より良いスコアのペアを保持
-        if (currentScore < bestScore) {
-          bestScore = currentScore;
-          bestPairs = [pair1, pair2];
-        }
+    // 固定ペアのプレイヤーを収集
+    roundFixedPairs.forEach(fp => {
+      const player1 = players.find(p => p[0] === fp.player1);
+      const player2 = players.find(p => p[0] === fp.player2);
+      
+      if (player1 && player2) {
+        fixedPairPlayers.push(fp.player1, fp.player2);
+        fixedPairData.push([player1, player2]);
       }
-    }
-    
-    return bestPairs;
-  };
-
-  // メインのペア生成ロジック
-  const generatePairs = (playerList) => {
-    // 全可能なペアを生成
-    const allPairs = [];
-    for (let i = 0; i < playerList.length; i++) {
-      for (let j = i + 1; j < playerList.length; j++) {
-        allPairs.push([playerList[i], playerList[j]]);
-      }
-    }
-
-    // 未対戦ペアのみフィルタリング
-    const unpairPairs = allPairs.filter(pair => {
-      const pairKey = [pair[0][0], pair[1][0]].sort().join(' & ');
-      return (pairingCounts[pairKey] || 0) === 0;
     });
-
-    // 未対戦ペアで最適な組み合わせを選択
-    if (unpairPairs.length >= 2) {
-      const optimalPairs = selectOptimalPairs(unpairPairs);
-      if (optimalPairs) {
-        const [pair1, pair2] = optimalPairs;
+    
+    // 固定ペア以外のプレイヤー
+    const remainingPlayers = players.filter(p => !fixedPairPlayers.includes(p[0]));
+    
+    // 固定ペアと残りのプレイヤーからペアを生成
+    if (fixedPairData.length > 0 && remainingPlayers.length >= 2) {
+      // 固定ペアの1つ
+      const fixedPair = fixedPairData[0];
+      
+      // 残りのプレイヤーからレベル差を考慮して2人を選ぶ
+      const opponentPair = selectOpponentsConsideringLevel(fixedPair, remainingPlayers, allPlayers, pairingType);
+      
+      if (opponentPair.length === 2) {
+        const pair1Key = [fixedPair[0][0], fixedPair[1][0]].sort().join(' & ');
+        const pair2Key = [opponentPair[0][0], opponentPair[1][0]].sort().join(' & ');
+        
+        pairingCounts[pair1Key] = (pairingCounts[pair1Key] || 0) + 1;
+        pairingCounts[pair2Key] = (pairingCounts[pair2Key] || 0) + 1;
+        fixedPair.forEach(player => playCountMap[player[0]]++);
+        opponentPair.forEach(player => playCountMap[player[0]]++);
+        
+        const pair1Type = getPairingType([fixedPair[0][0], fixedPair[1][0]], allPlayers);
+        const pair2Type = getPairingType([opponentPair[0][0], opponentPair[1][0]], allPlayers);
+        
+        const levelDiff = (fixedPair[0][1] + fixedPair[1][1]) - (opponentPair[0][1] + opponentPair[1][1]);
+        const pairingTypeText = pair1Type === pair2Type ?
+          (pair1Type === 'men' ? '男子ダブルス' :
+           pair1Type === 'women' ? '女子ダブルス' : 'ミックスダブルス') : '混合';
+        
         return [
-          pair1,
-          pair2,
-          (pair1[0][1] + pair1[1][1]) - (pair2[0][1] + pair2[1][1]),
-          getPairingType([pair1[0][0], pair1[1][0]], allPlayers),
-          getPairingType([pair2[0][0], pair2[1][0]], allPlayers)
+          fixedPair,
+          opponentPair,
+          levelDiff,
+          pair1Type,
+          pair2Type
         ];
       }
     }
+  }
 
-    // 未対戦ペアが不足している場合、全ペアから選択
-    console.warn("未対戦ペア不足のため、既存ペアを含めて選択");
-    const fallbackPairs = selectOptimalPairs(allPairs);
-    if (fallbackPairs) {
-      const [pair1, pair2] = fallbackPairs;
-      return [
-        pair1,
-        pair2,
-        (pair1[0][1] + pair1[1][1]) - (pair2[0][1] + pair2[1][1]),
-        getPairingType([pair1[0][0], pair1[1][0]], allPlayers),
-        getPairingType([pair2[0][0], pair2[1][0]], allPlayers)
-      ];
-    }
+  // 固定ペアがない場合の通常のペア生成ロジック
+  // レベル差が大きい場合にペアを調整する
+  return generateBalancedPairs(players, allPlayers, pairingType);
+}
 
-    return [[], [], 0, '', ''];
+// バランスの取れたペアを生成する関数（レベル差考慮）
+function generateBalancedPairs(players, allPlayers, pairingType) {
+  // 重み係数設定
+  const WEIGHTS = {
+    levelDiff: 1.0,    // レベル差の重み
+    unpairing: 40.5,    // 未対戦ペアの重み
+    playCount: 0.3     // 出場回数の重み
+  };
+  
+  // スコア計算関数
+  const calculateScore = (pair1, pair2) => {
+    const pair1Level = pair1[0][1] + pair1[1][1];
+    const pair2Level = pair2[0][1] + pair2[1][1];
+    const levelDiff = Math.abs(pair1Level - pair2Level);
+    
+    // 未対戦ペアのスコア
+    const pair1Key = [pair1[0][0], pair1[1][0]].sort().join(' & ');
+    const pair2Key = [pair2[0][0], pair2[1][0]].sort().join(' & ');
+    const unpairScore = 
+      ((pairingCounts[pair1Key] || 0) === 0 ? WEIGHTS.unpairing : 0) +
+      ((pairingCounts[pair2Key] || 0) === 0 ? WEIGHTS.unpairing : 0);
+    
+    // 出場回数スコア（少ない方が優先）
+    const playCountScore = 
+      (Math.max(playCountMap[pair1[0][0]], playCountMap[pair1[1][0]]) +
+       Math.max(playCountMap[pair2[0][0]], playCountMap[pair2[1][0]])) * WEIGHTS.playCount;
+    
+    // 総合スコア（小さい方が良い）
+    return levelDiff * WEIGHTS.levelDiff - unpairScore + playCountScore;
   };
 
-  // ペアタイプ別処理
-  if (pairingType === 'men') {
-    const malePlayers = players.filter(p => {
-      const player = allPlayers.find(ap => ap.name === p[0]);
-      return player && player.gender === 'male';
-    });
-    return generatePairs(malePlayers);
-  } else if (pairingType === 'women') {
-    const femalePlayers = players.filter(p => {
-      const player = allPlayers.find(ap => ap.name === p[0]);
-      return player && player.gender === 'female';
-    });
-    return generatePairs(femalePlayers);
-  } else if (pairingType === 'mix') {
-    const malePlayers = players.filter(p => {
-      const player = allPlayers.find(ap => ap.name === p[0]);
-      return player && player.gender === 'male';
-    });
-    const femalePlayers = players.filter(p => {
-      const player = allPlayers.find(ap => ap.name === p[0]);
-      return player && player.gender === 'female';
-    });
-
-    // ミックスダブルス用ペア生成
-    const mixPairs = [];
-    malePlayers.forEach(male => {
-      femalePlayers.forEach(female => {
-        mixPairs.push([male, female]);
-      });
-    });
-
-    const optimalPairs = selectOptimalPairs(mixPairs);
-    if (optimalPairs) {
-      const [pair1, pair2] = optimalPairs;
-      return [
-        pair1,
-        pair2,
-        (pair1[0][1] + pair1[1][1]) - (pair2[0][1] + pair2[1][1]),
-        'mix',
-        'mix'
-      ];
+  // 可能な全てのペアの組み合わせを生成
+  const allPossiblePairs = [];
+  for (let i = 0; i < players.length; i++) {
+    for (let j = i + 1; j < players.length; j++) {
+      allPossiblePairs.push([players[i], players[j]]);
     }
-    return [[], [], 0, '', ''];
-  } else {
-    return generatePairs(players);
   }
+
+  // ペアタイプに合致するペアのみフィルタリング
+  const filteredPairs = allPossiblePairs.filter(pair => {
+    const player1 = allPlayers.find(p => p.name === pair[0][0]);
+    const player2 = allPlayers.find(p => p.name === pair[1][0]);
+    
+    if (!player1 || !player2) return false;
+    
+    // ペアタイプチェック
+    if (pairingType === 'men') {
+      return player1.gender === 'male' && player2.gender === 'male';
+    } else if (pairingType === 'women') {
+      return player1.gender === 'female' && player2.gender === 'female';
+    } else if (pairingType === 'mix') {
+      return (player1.gender === 'male' && player2.gender === 'female') || 
+             (player1.gender === 'female' && player2.gender === 'male');
+    }
+    return true; // 'any'の場合は全て許可
+  });
+
+  // 最適なペアの組み合わせを探す
+  let bestScore = Infinity;
+  let bestPair1 = null;
+  let bestPair2 = null;
+  
+  for (let i = 0; i < filteredPairs.length; i++) {
+    for (let j = i + 1; j < filteredPairs.length; j++) {
+      const pair1 = filteredPairs[i];
+      const pair2 = filteredPairs[j];
+      
+      // 同じプレイヤーが重複していないかチェック
+      if (pair1[0][0] === pair2[0][0] || pair1[0][0] === pair2[1][0] ||
+          pair1[1][0] === pair2[0][0] || pair1[1][0] === pair2[1][0]) {
+        continue;
+      }
+      
+      const currentScore = calculateScore(pair1, pair2);
+      
+      // レベル差が3以上の場合はペアを調整
+      const pair1Level = pair1[0][1] + pair1[1][1];
+      const pair2Level = pair2[0][1] + pair2[1][1];
+      const levelDiff = Math.abs(pair1Level - pair2Level);
+      
+      if (levelDiff >= 3) {
+        // レベル差が大きい場合、再配置を試みる
+        const reassigned = reassignForBalance([...pair1, ...pair2], allPlayers, pairingType);
+        if (reassigned) {
+          const reassignedScore = calculateScore([reassigned[0], reassigned[1]], [reassigned[2], reassigned[3]]);
+          if (reassignedScore < currentScore) {
+            return [
+              [reassigned[0], reassigned[1]],
+              [reassigned[2], reassigned[3]],
+              (reassigned[0][1] + reassigned[1][1]) - (reassigned[2][1] + reassigned[3][1]),
+              getPairingType([reassigned[0][0], reassigned[1][0]], allPlayers),
+              getPairingType([reassigned[2][0], reassigned[3][0]], allPlayers)
+            ];
+          }
+        }
+      }
+      
+      if (currentScore < bestScore) {
+        bestScore = currentScore;
+        bestPair1 = pair1;
+        bestPair2 = pair2;
+      }
+    }
+  }
+  
+  if (bestPair1 && bestPair2) {
+    const pair1Type = getPairingType([bestPair1[0][0], bestPair1[1][0]], allPlayers);
+    const pair2Type = getPairingType([bestPair2[0][0], bestPair2[1][0]], allPlayers);
+    const levelDiff = (bestPair1[0][1] + bestPair1[1][1]) - (bestPair2[0][1] + bestPair2[1][1]);
+    
+    return [
+      bestPair1,
+      bestPair2,
+      levelDiff,
+      pair1Type,
+      pair2Type
+    ];
+  }
+  
+  return [[], [], 0, '', ''];
 }
-    function createMatchRow(courtNumber, a, b, diff, pair1Type, pair2Type, pairingTypeText) {
+
+// レベル差が大きい場合にペアを再配置する関数
+function reassignForBalance(players, allPlayers, pairingType) {
+  if (players.length !== 4) return null;
+  
+  // 全ての可能な組み合わせを試す
+  const combinations = [
+    [0, 1, 2, 3], [0, 2, 1, 3], [0, 3, 1, 2]
+  ];
+  
+  let bestCombination = players;
+  let minLevelDiff = Infinity;
+  
+  for (const combo of combinations) {
+    const pair1 = [players[combo[0]], players[combo[1]]];
+    const pair2 = [players[combo[2]], players[combo[3]]];
+    
+    // ペアタイプチェック
+    const pair1Type = getPairingType([pair1[0][0], pair1[1][0]], allPlayers);
+    const pair2Type = getPairingType([pair2[0][0], pair2[1][0]], allPlayers);
+    
+    let valid = true;
+    if (pairingType === 'men') {
+      valid = pair1Type === 'men' && pair2Type === 'men';
+    } else if (pairingType === 'women') {
+      valid = pair1Type === 'women' && pair2Type === 'women';
+    } else if (pairingType === 'mix') {
+      valid = pair1Type === 'mix' && pair2Type === 'mix';
+    }
+    
+    if (!valid) continue;
+    
+    const currentDiff = Math.abs(
+      (pair1[0][1] + pair1[1][1]) - 
+      (pair2[0][1] + pair2[1][1])
+    );
+    
+    if (currentDiff < minLevelDiff) {
+      minLevelDiff = currentDiff;
+      bestCombination = [pair1[0], pair1[1], pair2[0], pair2[1]];
+    }
+  }
+  
+  return minLevelDiff < Infinity ? bestCombination : null;
+}
+
+// レベル差を考慮して対戦相手を選ぶ関数（固定ペア用）
+function selectOpponentsConsideringLevel(fixedPair, remainingPlayers, allPlayers, pairingType) {
+  const fixedPairLevel = fixedPair[0][1] + fixedPair[1][1];
+  
+  // 可能な全てのペアを生成
+  const possibleOpponentPairs = [];
+  for (let i = 0; i < remainingPlayers.length; i++) {
+    for (let j = i + 1; j < remainingPlayers.length; j++) {
+      possibleOpponentPairs.push([remainingPlayers[i], remainingPlayers[j]]);
+    }
+  }
+  
+  // ペアタイプに合致するペアのみフィルタリング
+  const filteredPairs = possibleOpponentPairs.filter(pair => {
+    const player1 = allPlayers.find(p => p.name === pair[0][0]);
+    const player2 = allPlayers.find(p => p.name === pair[1][0]);
+    
+    if (!player1 || !player2) return false;
+    
+    // ペアタイプチェック
+    if (pairingType === 'men') {
+      return player1.gender === 'male' && player2.gender === 'male';
+    } else if (pairingType === 'women') {
+      return player1.gender === 'female' && player2.gender === 'female';
+    } else if (pairingType === 'mix') {
+      return (player1.gender === 'male' && player2.gender === 'female') || 
+             (player1.gender === 'female' && player2.gender === 'male');
+    }
+    return true; // 'any'の場合は全て許可
+  });
+  
+  if (filteredPairs.length === 0) {
+    return remainingPlayers.slice(0, 2); // 条件に合うペアがない場合はランダムに選択
+  }
+  
+  // レベル差が最小になるペアを選択
+  let bestPair = filteredPairs[0];
+  let minLevelDiff = Math.abs(fixedPairLevel - (bestPair[0][1] + bestPair[1][1]));
+  
+  for (const pair of filteredPairs) {
+    const currentLevelDiff = Math.abs(fixedPairLevel - (pair[0][1] + pair[1][1]));
+    if (currentLevelDiff < minLevelDiff) {
+      minLevelDiff = currentLevelDiff;
+      bestPair = pair;
+    }
+  }
+  
+  return bestPair;
+}
+
+    function createMatchRow(courtNumber, a, b, diff, pair1Type, pair2Type, pairingTypeText, isFixedPair = false) {
       const pair1TypeClass = pair1Type === 'men' ? 'men' : pair1Type === 'women' ? 'women' : 'mix';
       const pair2TypeClass = pair2Type === 'men' ? 'men' : pair2Type === 'women' ? 'women' : 'mix';
 
       const diffWarning = Math.abs(diff) > 3 ? `<span class="level-diff-warning"> (差が大きい!)</span>` : '';
+      const fixedPairClass = isFixedPair ? 'fixed-pair-highlight' : '';
 
-      return `<tr>
+      return `<tr class="${fixedPairClass}">
         <td>コート ${courtNumber}</td>
         <td><span class="bold-text">${a[0][0]} & ${a[1][0]} <span class="pairing-type ${pair1TypeClass}">${pair1Type === 'men' ? '男子' : pair1Type === 'women' ? '女子' : 'ミックス'}</span></span></td>
         <td><span class="bold-text">${b[0][0]} & ${b[1][0]} <span class="pairing-type ${pair2TypeClass}">${pair2Type === 'men' ? '男子' : pair2Type === 'women' ? '女子' : 'ミックス'}</span></span></td>
         <td><span class="bold-text">${diff}${diffWarning}</span></td>
-        <td>${pairingTypeText}</td>
+        <td>${pairingTypeText}${isFixedPair ? ' (固定ペア)' : ''}</td>
       </tr>`;
     }
 
@@ -1057,6 +1244,7 @@
       if (output) output.innerHTML = "";
 
       collectRestSettings();
+      collectFixedPairs();
 
       const players = [];
       const allPlayers = [];
@@ -1166,18 +1354,81 @@
         let assignedPlayers = new Set();
         let courtNumber = 1;
         let remainingPlayersList = [];
+        
+        // このラウンドの固定ペアを取得
+        const roundFixedPairs = fixedPairs.filter(fp => fp.round === roundNumber);
 
+        // 固定ペアがある場合、それらを優先的に割り当て
+        if (roundFixedPairs.length > 0) {
+          for (const fp of roundFixedPairs) {
+            if (courtNumber > courtCount) break;
+            
+            const player1 = selectedPlayers.find(p => p[0] === fp.player1);
+            const player2 = selectedPlayers.find(p => p[0] === fp.player2);
+            
+            if (player1 && player2 && !assignedPlayers.has(player1[0]) && !assignedPlayers.has(player2[0])) {
+              // 固定ペアの相手チームを選択
+              const availableOpponents = selectedPlayers.filter(
+                p => !assignedPlayers.has(p[0]) && p[0] !== player1[0] && p[0] !== player2[0]
+              );
+              
+              if (availableOpponents.length >= 2) {
+                // 固定ペアと対戦するペアを生成（レベル差を無視）
+                shuffle(availableOpponents);
+                const opponentPair = availableOpponents.slice(0, 2);
+                
+                if (opponentPair.length === 2) {
+                  const pair1Key = [player1[0], player2[0]].sort().join(' & ');
+                  const pair2Key = [opponentPair[0][0], opponentPair[1][0]].sort().join(' & ');
+                  currentRoundPairs.push(pair1Key, pair2Key);
+
+                  pairingCounts[pair1Key] = (pairingCounts[pair1Key] || 0) + 1;
+                  pairingCounts[pair2Key] = (pairingCounts[pair2Key] || 0) + 1;
+                  playCountMap[player1[0]]++;
+                  playCountMap[player2[0]]++;
+                  playCountMap[opponentPair[0][0]]++;
+                  playCountMap[opponentPair[1][0]]++;
+
+                  const pair1Type = getPairingType([player1[0], player2[0]], allPlayers);
+                  const pair2Type = getPairingType([opponentPair[0][0], opponentPair[1][0]], allPlayers);
+                  const levelDiff = (player1[1] + player2[1]) - (opponentPair[0][1] + opponentPair[1][1]);
+                  const pairingTypeText = pair1Type === pair2Type ?
+                    (pair1Type === 'men' ? '男子ダブルス' :
+                     pair1Type === 'women' ? '女子ダブルス' : 'ミックスダブルス') : '混合';
+
+                  html += createMatchRow(courtNumber, 
+                    [[player1[0], player1[1]], [player2[0], player2[1]]], 
+                    [[opponentPair[0][0], opponentPair[0][1]], [opponentPair[1][0], opponentPair[1][1]]], 
+                    levelDiff, pair1Type, pair2Type, pairingTypeText, true);
+
+                  assignedPlayers.add(player1[0]);
+                  assignedPlayers.add(player2[0]);
+                  assignedPlayers.add(opponentPair[0][0]);
+                  assignedPlayers.add(opponentPair[1][0]);
+
+                  roundData.courts.push({
+                    courtNumber: courtNumber,
+                    members: [player1[0], player2[0], opponentPair[0][0], opponentPair[1][0]],
+                    isFreePractice: false
+                  });
+
+                  courtNumber++;
+                }
+              }
+            }
+          }
+        }
+
+        // 残りのコートに通常のペアを割り当て
         while (courtNumber <= courtCount) {
           const availableForCourt = selectedPlayers.filter(p => !assignedPlayers.has(p[0]));
 
           if (availableForCourt.length >= 4) {
-            const [a, b, diff, pair1Type, pair2Type] = createPairs(availableForCourt, allPlayers, pairingType);
+            const [a, b, diff, pair1Type, pair2Type] = createPairs(availableForCourt, allPlayers, pairingType, roundNumber);
 
             if (a && b && a.length > 0 && b.length > 0) {
-              const pair1 = [a[0][0], a[1][0]].sort();
-              const pair2 = [b[0][0], b[1][0]].sort();
-              const pair1Key = pair1.join(' & ');
-              const pair2Key = pair2.join(' & ');
+              const pair1Key = [a[0][0], a[1][0]].sort().join(' & ');
+              const pair2Key = [b[0][0], b[1][0]].sort().join(' & ');
               currentRoundPairs.push(pair1Key, pair2Key);
 
               pairingCounts[pair1Key] = (pairingCounts[pair1Key] || 0) + 1;
@@ -1250,6 +1501,7 @@
         levels: levelInput.join('\n'),
         genders: genderInput.join('\n'),
         restSettings: restSettings,
+        fixedPairs: fixedPairs,
         eventInfo: {
           name: document.getElementById("eventName").value.trim(),
           location: document.getElementById("eventLocation").value.trim(),
@@ -1308,14 +1560,54 @@
 
       return restId;
     }
+    
+    function addFixedPairControl() {
+      const container = document.getElementById('fixedPairContainer');
+      const pairId = Date.now();
+
+      const pairItem = document.createElement('div');
+      pairItem.className = 'fixed-pair-item';
+      pairItem.id = `fixedPairItem-${pairId}`;
+
+      const player1Select = document.createElement('select');
+      player1Select.id = `fixedPairPlayer1-${pairId}`;
+
+      const player2Select = document.createElement('select');
+      player2Select.id = `fixedPairPlayer2-${pairId}`;
+
+      const roundInput = document.createElement('input');
+      roundInput.type = 'number';
+      roundInput.id = `fixedPairRound-${pairId}`;
+      roundInput.min = '1';
+      roundInput.placeholder = 'ラウンド番号';
+
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '削除';
+      removeBtn.onclick = function() {
+        container.removeChild(pairItem);
+        fixedPairs = fixedPairs.filter(item => item.id !== pairId);
+      };
+
+      pairItem.appendChild(player1Select);
+      pairItem.appendChild(player2Select);
+      pairItem.appendChild(roundInput);
+      pairItem.appendChild(removeBtn);
+
+      container.appendChild(pairItem);
+
+      updatePlayerSelects();
+
+      return pairId;
+    }
 
     function updatePlayerSelects() {
       const names = document.getElementById("playerNames").value.trim().split("\n");
 
       const allPlayers = names.filter(name => name.trim() !== '');
 
-      const selects = document.querySelectorAll('select[id^="restPlayer-"]');
-      selects.forEach(select => {
+      // 休憩設定のプレイヤー選択リストを更新
+      const restSelects = document.querySelectorAll('select[id^="restPlayer-"]');
+      restSelects.forEach(select => {
         const selectedValues = Array.from(select.selectedOptions).map(option => option.value);
 
         select.innerHTML = '';
@@ -1330,6 +1622,61 @@
           const option = Array.from(select.options).find(opt => opt.value === value);
           if (option) option.selected = true;
         });
+      });
+      
+      // 固定ペアのプレイヤー選択リストを更新
+      const pairSelects1 = document.querySelectorAll('select[id^="fixedPairPlayer1-"]');
+      const pairSelects2 = document.querySelectorAll('select[id^="fixedPairPlayer2-"]');
+      
+      pairSelects1.forEach(select => {
+        const currentValue = select.value;
+        select.innerHTML = '';
+        allPlayers.forEach(player => {
+          const option = document.createElement('option');
+          option.value = player.trim();
+          option.textContent = player.trim();
+          select.appendChild(option);
+        });
+        if (currentValue) select.value = currentValue;
+      });
+      
+      pairSelects2.forEach(select => {
+        const currentValue = select.value;
+        select.innerHTML = '';
+        allPlayers.forEach(player => {
+          const option = document.createElement('option');
+          option.value = player.trim();
+          option.textContent = player.trim();
+          select.appendChild(option);
+        });
+        if (currentValue) select.value = currentValue;
+      });
+    }
+
+    function collectFixedPairs() {
+      fixedPairs = [];
+      const pairItems = document.querySelectorAll('.fixed-pair-item');
+
+      pairItems.forEach(item => {
+        const id = item.id.replace('fixedPairItem-', '');
+        const player1Select = document.getElementById(`fixedPairPlayer1-${id}`);
+        const player2Select = document.getElementById(`fixedPairPlayer2-${id}`);
+        const roundInput = document.getElementById(`fixedPairRound-${id}`);
+
+        if (player1Select && player2Select && roundInput && roundInput.value) {
+          const player1 = player1Select.value;
+          const player2 = player2Select.value;
+          const round = parseInt(roundInput.value);
+
+          if (player1 && player2 && !isNaN(round)) {
+            fixedPairs.push({
+              id: id,
+              player1: player1,
+              player2: player2,
+              round: round
+            });
+          }
+        }
       });
     }
 
@@ -1463,6 +1810,7 @@
         const eventTime = document.getElementById("eventTime").value;
 
         collectRestSettings();
+        collectFixedPairs();
 
         const data = {
           court: courtCount,
@@ -1471,6 +1819,7 @@
           levels: playerLevels,
           genders: playerGenders,
           restSettings: restSettings,
+          fixedPairs: fixedPairs,
           // イベント情報を追加
           eventInfo: {
             name: eventName,
@@ -1521,6 +1870,25 @@
         }
       });
     }
+    
+    function loadFixedPairs(settings) {
+      const container = document.getElementById('fixedPairContainer');
+      container.innerHTML = '';
+
+      settings.forEach(setting => {
+        const pairId = addFixedPairControl();
+
+        const player1Select = document.getElementById(`fixedPairPlayer1-${pairId}`);
+        const player2Select = document.getElementById(`fixedPairPlayer2-${pairId}`);
+        const roundInput = document.getElementById(`fixedPairRound-${pairId}`);
+
+        if (player1Select && player2Select && roundInput) {
+          player1Select.value = setting.player1;
+          player2Select.value = setting.player2;
+          roundInput.value = setting.round;
+        }
+      });
+    }
 
     function saveData() {
       const data = {
@@ -1535,7 +1903,8 @@
           playerNames: document.getElementById("playerNames").value,
           playerLevels: document.getElementById("playerLevels").value,
           playerGenders: document.getElementById("playerGenders").value,
-          restSettings: restSettings
+          restSettings: restSettings,
+          fixedPairs: fixedPairs
         }
       };
 
@@ -1574,6 +1943,10 @@
           if (td.restSettings) {
             loadRestSettings(td.restSettings);
           }
+          
+          if (td.fixedPairs) {
+            loadFixedPairs(td.fixedPairs);
+          }
         }
 
         alert('データを読み込みました');
@@ -1596,7 +1969,8 @@
           playerNames: document.getElementById("playerNames").value,
           playerLevels: document.getElementById("playerLevels").value,
           playerGenders: document.getElementById("playerGenders").value,
-          restSettings: restSettings
+          restSettings: restSettings,
+          fixedPairs: fixedPairs
         }
       };
 
@@ -1609,6 +1983,7 @@
       URL.revokeObjectURL(url);
     }
 
+    
     function importData(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1638,6 +2013,10 @@
 
             if (td.restSettings) {
               loadRestSettings(td.restSettings);
+            }
+            
+            if (td.fixedPairs) {
+              loadFixedPairs(td.fixedPairs);
             }
           }
 
@@ -1737,6 +2116,17 @@
                 pairType = type1 === type2 ?
                           (type1 === '男子' ? '男子ダブルス' :
                            type1 === '女子' ? '女子ダブルス' : 'ミックスダブルス') : '混合';
+              }
+
+              // 固定ペアかどうかをチェック
+              const isFixedPair = fixedPairs.some(fp => 
+                fp.round === round.roundNumber && 
+                ((fp.player1 === court.members[0] && fp.player2 === court.members[1]) || 
+                 (fp.player1 === court.members[1] && fp.player2 === court.members[0]))
+              );
+              
+              if (isFixedPair) {
+                pairType += ' (固定ペア)';
               }
 
               csvContent += `コート ${court.courtNumber},${teamA},${teamB},${levelDiff},${pairType}\n`;
@@ -1851,6 +2241,9 @@
             .unpaired-highlight {
               background-color: #fffde7;
             }
+            .fixed-pair-highlight {
+              background-color: #e8f5e9;
+            }
           </style>
         </head>
         <body>
@@ -1923,6 +2316,10 @@
 
           if (data.restSettings) {
             loadRestSettings(data.restSettings);
+          }
+          
+          if (data.fixedPairs) {
+            loadFixedPairs(data.fixedPairs);
           }
 
           document.querySelectorAll('.tab-content').forEach(tab => {
