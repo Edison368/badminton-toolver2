@@ -573,6 +573,212 @@
     #addJoinRoundBtn:hover {
       background-color: #7B1FA2;
     }
+
+    /* チーム登録用スタイル */
+    .team-registration {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #dee2e6;
+    }
+
+    .team-list {
+      margin-top: 20px;
+    }
+
+    .team-item {
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border: 1px solid #dee2e6;
+    }
+
+    .team-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .team-name {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .team-members {
+      margin-top: 10px;
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .member-item:last-child {
+      border-bottom: none;
+    }
+
+    .member-checkbox {
+      margin-right: 10px;
+    }
+
+    .member-details {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .member-name {
+      font-weight: bold;
+    }
+
+    .member-level {
+      color: #666;
+    }
+
+    .member-gender {
+      color: #666;
+    }
+
+    .team-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .team-actions button {
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+
+    .team-form {
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .member-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .member-form input, .member-form select {
+      flex: 1;
+    }
+
+    .add-member-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add-member-btn:hover {
+      background-color: #45a049;
+    }
+
+    .save-team-btn {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .save-team-btn:hover {
+      background-color: #0b7dda;
+    }
+
+    .delete-team-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .delete-team-btn:hover {
+      background-color: #c82333;
+    }
+
+    .team-selector {
+      margin-bottom: 20px;
+    }
+
+    .team-selector select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .selected-members {
+      margin-top: 20px;
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border: 1px solid #dee2e6;
+    }
+
+    .selected-members h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .selected-members-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .selected-members-list li {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .selected-members-list li:last-child {
+      border-bottom: none;
+    }
+
+    /* 一括選択/クリアボタンのスタイル */
+    .batch-selection-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .batch-selection-buttons button {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    #selectAllMembers {
+      background-color: #4CAF50;
+    }
+
+    #clearSelectedMembers {
+      background-color: #dc3545;
+    }
+
+    #clearRegisteredPlayers {
+      background-color: #dc3545;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -582,12 +788,67 @@
   </header>
 
   <div class="tab-container">
-    <button class="tab active" onclick="openTab(event, 'eventTab')">イベント登録</button>
+    <button class="tab active" onclick="openTab(event, 'teamRegistrationTab')">チーム登録</button>
+    <button class="tab" onclick="openTab(event, 'eventTab')">イベント登録</button>
     <button class="tab" onclick="openTab(event, 'teamTab')">チーム分け</button>
   </div>
 
+  <!-- チーム登録タブ -->
+  <div id="teamRegistrationTab" class="tab-content active">
+    <div class="team-registration">
+      <h3>チーム登録</h3>
+      
+      <div class="team-form">
+        <div class="form-group">
+          <label for="teamName">チーム名:</label>
+          <input type="text" id="teamName" placeholder="チーム名を入力">
+        </div>
+        
+        <h4>メンバー追加</h4>
+        <div class="member-form">
+          <input type="text" id="memberName" placeholder="名前">
+          <select id="memberGender">
+            <option value="male">男性</option>
+            <option value="female">女性</option>
+          </select>
+          <input type="number" id="memberLevel" min="1" max="5" value="3" placeholder="レベル">
+          <button class="add-member-btn" onclick="addMemberToTeam()">追加</button>
+        </div>
+        
+        <div id="teamMembersList">
+          <!-- 追加されたメンバーがここに表示されます -->
+        </div>
+        
+        <button class="save-team-btn" onclick="saveTeam()">チームを保存</button>
+      </div>
+      
+      <div class="team-list" id="teamList">
+        <!-- 登録されたチームがここに表示されます -->
+      </div>
+    </div>
+    
+    <div class="team-selector">
+      <h3>チーム選択</h3>
+      <select id="teamSelector" onchange="loadTeamMembers()">
+        <option value="">チームを選択してください</option>
+      </select>
+    </div>
+    
+    <div class="selected-members">
+      <h3>選択されたメンバー</h3>
+      <div class="batch-selection-buttons">
+        <button id="selectAllMembers" onclick="selectAllMembers()">全メンバー選択</button>
+        <button id="clearSelectedMembers" onclick="clearSelectedMembers()">選択クリア</button>
+      </div>
+      <ul class="selected-members-list" id="selectedMembersList">
+        <!-- 選択されたメンバーがここに表示されます -->
+      </ul>
+      <button onclick="addSelectedMembersToEvent()">選択したメンバーをイベントに追加</button>
+    </div>
+  </div>
+
   <!-- イベント登録タブ -->
-  <div id="eventTab" class="tab-content active">
+  <div id="eventTab" class="tab-content">
     <div class="event-form">
       <h3>イベント情報</h3>
       <div class="form-row">
@@ -643,6 +904,7 @@
       </div>
     </div>
     <button onclick="addPlayer()">プレイヤーを登録</button>
+    <button id="clearRegisteredPlayers" onclick="clearRegisteredPlayers()">登録済みプレイヤーを全削除</button>
 
     <h3>登録済みプレイヤー</h3>
     <table class="player-table">
@@ -713,7 +975,7 @@
       </div>
 
       <div class="generation-buttons">
-        <button id="generateAny" onclick="generateRounds('any')">なんでも生成</button>
+        <button id="generateAny" onclick="generateRounds('any')">生成</button>
         <button id="generateMix" onclick="generateRounds('mix')">ミックスダブルス生成</button>
         <button id="generateMen" onclick="generateRounds('men')">男子ダブルス生成</button>
         <button id="generateWomen" onclick="generateRounds('women')">女子ダブルス生成</button>
@@ -770,6 +1032,9 @@
     let allPossiblePairs = [];
     let currentShareData = null;
     let lastPairingForPlayer = {}; // プレイヤーの最後のペアを記録
+    let teams = []; // チームデータを保持する配列
+    let currentTeamMembers = []; // 現在編集中のチームのメンバー
+    let selectedMembers = []; // 選択されたメンバー
 
     // レベルスライダーの値を表示する関数
     function updateLevelDisplay() {
@@ -796,6 +1061,367 @@
       });
       document.getElementById(tabId).classList.add('active');
       event.currentTarget.classList.add('active');
+    }
+
+    // チーム関連の関数
+    function addMemberToTeam() {
+      const name = document.getElementById('memberName').value.trim();
+      const gender = document.getElementById('memberGender').value;
+      const level = parseInt(document.getElementById('memberLevel').value);
+
+      if (!name) {
+        alert('メンバー名を入力してください');
+        return;
+      }
+
+      if (isNaN(level) || level < 1 || level > 5) {
+        alert('レベルを正しく入力してください (1-5)');
+        return;
+      }
+
+      // 既に同じ名前のメンバーがいるかチェック
+      if (currentTeamMembers.some(member => member.name === name)) {
+        alert('この名前のメンバーは既に追加されています');
+        return;
+      }
+
+      currentTeamMembers.push({ name, gender, level });
+      updateTeamMembersList();
+
+      // 入力フィールドをクリア
+      document.getElementById('memberName').value = '';
+      document.getElementById('memberLevel').value = '3';
+    }
+
+    function updateTeamMembersList() {
+      const container = document.getElementById('teamMembersList');
+      container.innerHTML = '';
+
+      if (currentTeamMembers.length === 0) {
+        container.innerHTML = '<p>メンバーが追加されていません</p>';
+        return;
+      }
+
+      const list = document.createElement('ul');
+      list.style.listStyleType = 'none';
+      list.style.padding = '0';
+
+      currentTeamMembers.forEach((member, index) => {
+        const item = document.createElement('li');
+        item.style.display = 'flex';
+        item.style.justifyContent = 'space-between';
+        item.style.alignItems = 'center';
+        item.style.padding = '8px 0';
+        item.style.borderBottom = '1px solid #eee';
+
+        const memberInfo = document.createElement('div');
+        memberInfo.innerHTML = `
+          <span style="font-weight: bold;">${member.name}</span>
+          <span style="color: #666; margin-left: 10px;">レベル: ${member.level}</span>
+          <span style="color: #666; margin-left: 10px;">${member.gender === 'male' ? '男性' : '女性'}</span>
+        `;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '削除';
+        deleteBtn.style.backgroundColor = '#dc3545';
+        deleteBtn.style.color = 'white';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.padding = '5px 10px';
+        deleteBtn.style.borderRadius = '5px';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.onclick = () => {
+          currentTeamMembers.splice(index, 1);
+          updateTeamMembersList();
+        };
+
+        item.appendChild(memberInfo);
+        item.appendChild(deleteBtn);
+        list.appendChild(item);
+      });
+
+      container.appendChild(list);
+    }
+
+    function saveTeam() {
+      const teamName = document.getElementById('teamName').value.trim();
+
+      if (!teamName) {
+        alert('チーム名を入力してください');
+        return;
+      }
+
+      if (currentTeamMembers.length === 0) {
+        alert('メンバーを追加してください');
+        return;
+      }
+
+      // 既存のチームを更新するか新しいチームを追加する
+      const existingTeamIndex = teams.findIndex(team => team.name === teamName);
+      
+      if (existingTeamIndex >= 0) {
+        // 既存のチームを更新
+        teams[existingTeamIndex].members = [...currentTeamMembers];
+      } else {
+        // 新しいチームを追加
+        teams.push({
+          name: teamName,
+          members: [...currentTeamMembers]
+        });
+      }
+
+      // チームリストを更新
+      updateTeamList();
+      
+      // チームセレクターを更新
+      updateTeamSelector();
+      
+      // フォームをリセット
+      document.getElementById('teamName').value = '';
+      currentTeamMembers = [];
+      updateTeamMembersList();
+      
+      alert('チームを保存しました');
+    }
+
+    function updateTeamList() {
+      const container = document.getElementById('teamList');
+      container.innerHTML = '';
+
+      if (teams.length === 0) {
+        container.innerHTML = '<p>登録されたチームがありません</p>';
+        return;
+      }
+
+      teams.forEach((team, teamIndex) => {
+        const teamItem = document.createElement('div');
+        teamItem.className = 'team-item';
+        
+        const teamHeader = document.createElement('div');
+        teamHeader.className = 'team-header';
+        
+        const teamName = document.createElement('div');
+        teamName.className = 'team-name';
+        teamName.textContent = team.name;
+        
+        const teamActions = document.createElement('div');
+        teamActions.className = 'team-actions';
+        
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '編集';
+        editBtn.style.backgroundColor = '#2196F3';
+        editBtn.onclick = () => editTeam(teamIndex);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '削除';
+        deleteBtn.style.backgroundColor = '#dc3545';
+        deleteBtn.onclick = () => deleteTeam(teamIndex);
+        
+        teamActions.appendChild(editBtn);
+        teamActions.appendChild(deleteBtn);
+        teamHeader.appendChild(teamName);
+        teamHeader.appendChild(teamActions);
+        
+        const membersList = document.createElement('div');
+        membersList.className = 'team-members';
+        
+        team.members.forEach(member => {
+          const memberItem = document.createElement('div');
+          memberItem.className = 'member-item';
+          
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.className = 'member-checkbox';
+          checkbox.value = member.name;
+          checkbox.onchange = (e) => toggleMemberSelection(member, e.target.checked);
+          
+          const memberDetails = document.createElement('div');
+          memberDetails.className = 'member-details';
+          
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'member-name';
+          nameSpan.textContent = member.name;
+          
+          const levelSpan = document.createElement('span');
+          levelSpan.className = 'member-level';
+          levelSpan.textContent = `レベル: ${member.level}`;
+          
+          const genderSpan = document.createElement('span');
+          genderSpan.className = 'member-gender';
+          genderSpan.textContent = member.gender === 'male' ? '男性' : '女性';
+          
+          memberDetails.appendChild(nameSpan);
+          memberDetails.appendChild(levelSpan);
+          memberDetails.appendChild(genderSpan);
+          
+          memberItem.appendChild(checkbox);
+          memberItem.appendChild(memberDetails);
+          membersList.appendChild(memberItem);
+        });
+        
+        teamItem.appendChild(teamHeader);
+        teamItem.appendChild(membersList);
+        container.appendChild(teamItem);
+      });
+    }
+
+    function updateTeamSelector() {
+      const selector = document.getElementById('teamSelector');
+      selector.innerHTML = '<option value="">チームを選択してください</option>';
+      
+      teams.forEach(team => {
+        const option = document.createElement('option');
+        option.value = team.name;
+        option.textContent = team.name;
+        selector.appendChild(option);
+      });
+    }
+
+    function loadTeamMembers() {
+      const teamName = document.getElementById('teamSelector').value;
+      if (!teamName) return;
+      
+      const team = teams.find(t => t.name === teamName);
+      if (!team) return;
+      
+      // 選択されたメンバーリストを更新
+      const selectedList = document.getElementById('selectedMembersList');
+      selectedList.innerHTML = '';
+      
+      team.members.forEach(member => {
+        const item = document.createElement('li');
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = selectedMembers.some(m => m.name === member.name);
+        checkbox.onchange = (e) => toggleMemberSelection(member, e.target.checked);
+        
+        const memberInfo = document.createElement('span');
+        memberInfo.textContent = `${member.name} (レベル: ${member.level}, ${member.gender === 'male' ? '男性' : '女性'})`;
+        
+        item.appendChild(checkbox);
+        item.appendChild(memberInfo);
+        selectedList.appendChild(item);
+      });
+    }
+
+    function toggleMemberSelection(member, isSelected) {
+      if (isSelected) {
+        // 既に選択されていないかチェック
+        if (!selectedMembers.some(m => m.name === member.name)) {
+          selectedMembers.push(member);
+        }
+      } else {
+        // 選択から削除
+        selectedMembers = selectedMembers.filter(m => m.name !== member.name);
+      }
+      
+      updateSelectedMembersList();
+    }
+
+    function updateSelectedMembersList() {
+      const container = document.getElementById('selectedMembersList');
+      container.innerHTML = '';
+      
+      selectedMembers.forEach(member => {
+        const item = document.createElement('li');
+        item.textContent = `${member.name} (レベル: ${member.level}, ${member.gender === 'male' ? '男性' : '女性'})`;
+        container.appendChild(item);
+      });
+    }
+
+    // 全メンバー選択関数
+    function selectAllMembers() {
+      const teamName = document.getElementById('teamSelector').value;
+      if (!teamName) {
+        alert('チームを選択してください');
+        return;
+      }
+      
+      const team = teams.find(t => t.name === teamName);
+      if (!team) return;
+      
+      // 全メンバーを選択
+      selectedMembers = [...team.members];
+      
+      // チェックボックスを更新
+      const checkboxes = document.querySelectorAll('.member-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+      });
+      
+      updateSelectedMembersList();
+      alert('全メンバーを選択しました');
+    }
+
+    // 選択クリア関数
+    function clearSelectedMembers() {
+      selectedMembers = [];
+      
+      // チェックボックスを更新
+      const checkboxes = document.querySelectorAll('.member-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      
+      updateSelectedMembersList();
+      alert('選択をクリアしました');
+    }
+
+    // 登録済みプレイヤー全削除関数
+    function clearRegisteredPlayers() {
+      if (confirm('登録済みの全プレイヤーを削除しますか？この操作は元に戻せません。')) {
+        registeredPlayers = [];
+        updateRegisteredPlayersList();
+        updateTeamDivisionPlayers();
+        alert('登録済みプレイヤーを全削除しました');
+      }
+    }
+
+    function addSelectedMembersToEvent() {
+      if (selectedMembers.length === 0) {
+        alert('メンバーを選択してください');
+        return;
+      }
+      
+      // イベント登録タブに移動
+      openTab({ currentTarget: document.querySelector('.tab-container button:nth-child(2)') }, 'eventTab');
+      
+      // 選択されたメンバーを登録済みプレイヤーに追加
+      selectedMembers.forEach(member => {
+        // 既に登録されていないかチェック
+        if (!registeredPlayers.some(p => p.name === member.name)) {
+          registeredPlayers.push({
+            name: member.name,
+            level: member.level,
+            gender: member.gender,
+            joinRound: 1
+          });
+        }
+      });
+      
+      updateRegisteredPlayersList();
+      alert('選択したメンバーをイベントに追加しました');
+    }
+
+    function editTeam(teamIndex) {
+      const team = teams[teamIndex];
+      
+      // フォームにチーム情報をセット
+      document.getElementById('teamName').value = team.name;
+      currentTeamMembers = [...team.members];
+      
+      updateTeamMembersList();
+      
+      // チーム登録タブに移動
+      openTab({ currentTarget: document.querySelector('.tab-container button:nth-child(1)') }, 'teamRegistrationTab');
+    }
+
+    function deleteTeam(teamIndex) {
+      if (confirm('このチームを削除しますか？')) {
+        teams.splice(teamIndex, 1);
+        updateTeamList();
+        updateTeamSelector();
+      }
     }
 
     function addPlayer() {
@@ -899,7 +1525,7 @@
       document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.remove('active');
       });
-      document.querySelector('.tab-container button:nth-child(2)').classList.add('active');
+      document.querySelector('.tab-container button:nth-child(3)').classList.add('active');
 
       updateTeamDivisionPlayers();
     }
@@ -1697,7 +2323,8 @@
           date: document.getElementById("eventDate").value,
           time: document.getElementById("eventTime").value
         },
-        registeredPlayers: registeredPlayers
+        registeredPlayers: registeredPlayers,
+        teams: teams
       };
 
       return fullHtml;
@@ -2105,7 +2732,8 @@
             date: eventDate,
             time: eventTime
           },
-          registeredPlayers: registeredPlayers
+          registeredPlayers: registeredPlayers,
+          teams: teams
         };
 
         const encodedData = encodeURIComponent(JSON.stringify(data));
@@ -2192,6 +2820,7 @@
         eventDate: document.getElementById("eventDate").value,
         eventTime: document.getElementById("eventTime").value,
         registeredPlayers: registeredPlayers,
+        teams: teams,
         teamDivisionData: {
           courtCount: document.getElementById("courtCount").value,
           totalRounds: document.getElementById("totalRounds").value,
@@ -2227,6 +2856,12 @@
         if (data.registeredPlayers) {
           registeredPlayers = data.registeredPlayers;
           updateRegisteredPlayersList();
+        }
+
+        if (data.teams) {
+          teams = data.teams;
+          updateTeamList();
+          updateTeamSelector();
         }
 
         if (data.teamDivisionData) {
@@ -2265,6 +2900,7 @@
         eventDate: document.getElementById("eventDate").value,
         eventTime: document.getElementById("eventTime").value,
         registeredPlayers: registeredPlayers,
+        teams: teams,
         teamDivisionData: {
           courtCount: document.getElementById("courtCount").value,
           totalRounds: document.getElementById("totalRounds").value,
@@ -2287,7 +2923,6 @@
       URL.revokeObjectURL(url);
     }
 
-    
     function importData(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -2305,6 +2940,12 @@
           if (data.registeredPlayers) {
             registeredPlayers = data.registeredPlayers;
             updateRegisteredPlayersList();
+          }
+
+          if (data.teams) {
+            teams = data.teams;
+            updateTeamList();
+            updateTeamSelector();
           }
 
           if (data.teamDivisionData) {
@@ -2375,6 +3016,19 @@
           }
         }
         csvContent += "\n";
+
+        // チーム情報
+        if (currentShareData.teams && currentShareData.teams.length > 0) {
+          csvContent += "チーム情報\n";
+          currentShareData.teams.forEach(team => {
+            csvContent += `チーム名,${team.name}\n`;
+            csvContent += "メンバー,レベル,性別\n";
+            team.members.forEach(member => {
+              csvContent += `${member.name},${member.level},${member.gender === 'male' ? '男性' : '女性'}\n`;
+            });
+            csvContent += "\n";
+          });
+        }
 
         // ラウンド情報
         allRoundData.forEach(round => {
@@ -2634,6 +3288,12 @@
             updateRegisteredPlayersList();
           }
 
+          if (data.teams) {
+            teams = data.teams;
+            updateTeamList();
+            updateTeamSelector();
+          }
+
           if (data.restSettings) {
             loadRestSettings(data.restSettings);
           }
@@ -2654,7 +3314,7 @@
           document.querySelectorAll('.tab').forEach(tab => {
             tab.classList.remove('active');
           });
-          document.querySelector('.tab-container button:nth-child(2)').classList.add('active');
+          document.querySelector('.tab-container button:nth-child(3)').classList.add('active');
 
           generateRounds('any');
         } catch (e) {
