@@ -785,11 +785,19 @@
     .qr-code-container {
       margin-top: 15px;
       text-align: center;
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     #qrCode {
       margin: 10px auto;
       display: block;
+      min-height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .qr-code-buttons {
@@ -2788,21 +2796,26 @@
       const qrCodeElement = document.getElementById("qrCode");
       qrCodeElement.innerHTML = ""; // 既存のQRコードをクリア
       
-      QRCode.toCanvas(text, { 
-        width: 200,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#ffffff'
-        }
-      }, function (error, canvas) {
-        if (error) {
-          console.error("QRコード生成エラー:", error);
-          qrCodeElement.innerHTML = "<p>QRコードの生成に失敗しました</p>";
-        } else {
-          qrCodeElement.appendChild(canvas);
-        }
-      });
+      try {
+        QRCode.toCanvas(text, { 
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#ffffff'
+          }
+        }, function (error, canvas) {
+          if (error) {
+            console.error("QRコード生成エラー:", error);
+            qrCodeElement.innerHTML = "<p>QRコードの生成に失敗しました</p>";
+          } else {
+            qrCodeElement.appendChild(canvas);
+          }
+        });
+      } catch (error) {
+        console.error("QRコード生成エラー:", error);
+        qrCodeElement.innerHTML = "<p>QRコードの生成に失敗しました</p>";
+      }
     }
 
     // QRコードをダウンロードする関数
