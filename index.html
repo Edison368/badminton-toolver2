@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>バドミントンチーム分けAPP</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -779,6 +780,27 @@
       background-color: #dc3545;
       margin-top: 10px;
     }
+
+    /* QRコード用スタイル */
+    .qr-code-container {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    #qrCode {
+      margin: 10px auto;
+      display: block;
+    }
+
+    .qr-code-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .qr-code-buttons button {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
@@ -986,6 +1008,15 @@
       <button onclick="generateShareLink()">🔗 シェアリンクを生成</button>
       <button onclick="copyShareLink()">📋 リンクをコピー</button>
       <input type="text" id="shareLink" readonly />
+      
+      <!-- QRコード表示エリア -->
+      <div class="qr-code-container">
+        <div id="qrCode"></div>
+        <div class="qr-code-buttons">
+          <button onclick="downloadQRCode()" style="background-color: #673AB7;">📥 QRコードをダウンロード</button>
+          <button onclick="printQRCode()" style="background-color: #009688;">🖨️ QRコードを印刷</button>
+        </div>
+      </div>
 
       <!-- 新しいウィンドウで開くボタン -->
       <button class="new-window-btn" onclick="openInNewWindow('any')">🖥️ なんでも生成 (新規ウィンドウ)</button>
@@ -2740,12 +2771,98 @@
         const shareURL = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
 
         document.getElementById("shareLink").value = shareURL;
+        
+        // QRコードを生成
+        generateQRCode(shareURL);
+        
         return true;
       } catch (error) {
         console.error("シェアリンク生成エラー:", error);
         alert("シェアリンクの生成に失敗しました");
         return false;
       }
+    }
+
+    // QRコードを生成する関数
+    function generateQRCode(text) {
+      const qrCodeElement = document.getElementById("qrCode");
+      qrCodeElement.innerHTML = ""; // 既存のQRコードをクリア
+      
+      QRCode.toCanvas(text, { 
+        width: 200,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        }
+      }, function (error, canvas) {
+        if (error) {
+          console.error("QRコード生成エラー:", error);
+          qrCodeElement.innerHTML = "<p>QRコードの生成に失敗しました</p>";
+        } else {
+          qrCodeElement.appendChild(canvas);
+        }
+      });
+    }
+
+    // QRコードをダウンロードする関数
+    function downloadQRCode() {
+      const canvas = document.querySelector("#qrCode canvas");
+      if (!canvas) {
+        alert("先にシェアリンクを生成してください");
+        return;
+      }
+      
+      const link = document.createElement('a');
+      link.download = 'badminton-team-qrcode.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // QRコードを印刷する関数
+    function printQRCode() {
+      const canvas = document.querySelector("#qrCode canvas");
+      if (!canvas) {
+        alert("先にシェアリンクを生成してください");
+        return;
+      }
+      
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>QRコード印刷</title>
+          <style>
+            body { 
+              text-align: center; 
+              padding: 20px;
+              font-family: Arial, sans-serif;
+            }
+            h1 { 
+              margin-bottom: 20px;
+            }
+            img { 
+              max-width: 100%; 
+              height: auto;
+            }
+            @media print {
+              button { 
+                display: none; 
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>バドミントンチーム分けツール - QRコード</h1>
+          <img src="${canvas.toDataURL('image/png')}" alt="QR Code">
+          <p>${document.getElementById("shareLink").value}</p>
+          <button onclick="window.print()">印刷</button>
+          <button onclick="window.close()">閉じる</button>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
     }
 
     function copyShareLink() {
